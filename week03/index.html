@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>IT280 Week 3 · Colour and Digital Images</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Manrope:wght@400..800&family=IBM+Plex+Sans+Arabic:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a self-study reading page. Contents rail on the left, a 68-character reading column,
+   wider panels for the hands-on demos. Palette: cool blue-grey neutrals 60%, ink and blue 30%, muted amber 10%. */
+:root{
+  --bg:#F4F6F8; --surface:#FFFFFF; --soft:#EAEEF3; --line:#DCE2EA;
+  --ink:#13213A; --text:#2E3B52; --muted:#5A6679;
+  --blue:#2D5BC9; --blue-text:#2A51B0; --blue-soft:#E6EDFB;
+  --amber:#E2A04A; --amber-text:#8A5A12; --amber-soft:#FBF1E2;
+  --good:#0B7A58; --good-soft:#D9F4EA; --bad:#B3322F; --bad-soft:#FBE4E2;
+  --night:#13213A; --on-night:#EEF2F7; --on-night-muted:#A9B4C6;
+  --radius:22px; --radius-sm:14px;
+  --shadow:0 1px 2px rgba(19,33,58,.06),0 12px 30px -14px rgba(19,33,58,.22);
+  --f-display:"Bricolage Grotesque","Manrope",system-ui,"Segoe UI",sans-serif;
+  --f-body:"Manrope",system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+  --f-ar:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0D1524; --surface:#152238; --soft:#1C2B44; --line:#273852; --ink:#EEF2F7; --text:#CDD5E3; --muted:#A3AEC0;
+  --blue:#7FA2F0; --blue-text:#9BB6F5; --blue-soft:#1E2E52; --amber:#E8B468; --amber-text:#F0C687; --amber-soft:#3A2F1C;
+  --good:#5FD6AC; --good-soft:#11352A; --bad:#FF9A90; --bad-soft:#3D1F22; --night:#1C2B44;
+  --shadow:0 12px 30px -14px rgba(0,0,0,.6); color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0D1524; --surface:#152238; --soft:#1C2B44; --line:#273852; --ink:#EEF2F7; --text:#CDD5E3; --muted:#A3AEC0;
+  --blue:#7FA2F0; --blue-text:#9BB6F5; --blue-soft:#1E2E52; --amber:#E8B468; --amber-text:#F0C687; --amber-soft:#3A2F1C;
+  --good:#5FD6AC; --good-soft:#11352A; --bad:#FF9A90; --bad-soft:#3D1F22; --night:#1C2B44;
+  --shadow:0 12px 30px -14px rgba(0,0,0,.6); color-scheme:dark; }
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{margin:0; background:var(--bg); color:var(--text); font:400 17.5px/1.7 var(--f-body)}
+a{color:var(--blue-text)}
+:focus-visible{outline:3px solid var(--blue); outline-offset:2px; border-radius:8px}
+h1,h2,h3,h4{font-family:var(--f-display); color:var(--ink); margin:0; text-wrap:balance; font-weight:650}
+h1{font-size:clamp(38px,5vw,58px); line-height:1.05; letter-spacing:-.02em}
+h1 em{font-style:normal; color:var(--blue)}
+h2{font-size:clamp(26px,2.8vw,34px); line-height:1.18; letter-spacing:-.01em}
+h3{font-size:20px; line-height:1.3}
+p{margin:0}
+code,.mono{font-family:var(--f-mono); font-size:.92em}
+.eyebrow{font:700 13px/1.4 var(--f-body); letter-spacing:.06em; color:var(--blue-text)}
+.muted{color:var(--muted); font-size:15px}
+.skip{position:absolute; left:-999px; top:8px; background:var(--surface); padding:8px 12px; border-radius:10px; z-index:50}
+.skip:focus{left:8px}
+
+/* header */
+.top{position:sticky; top:0; z-index:20; background:color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+.top-in{max-width:1280px; margin:0 auto; padding:10px 24px; display:flex; align-items:center; gap:16px}
+.brand{display:flex; align-items:center; gap:10px; font:700 17px var(--f-display); color:var(--ink); text-decoration:none}
+.brand i{width:14px; height:14px; border-radius:4px; background:linear-gradient(135deg,#E8505B 0 33%,#3BB273 33% 66%,#3D7BE0 66%)}
+.sp{flex:1}
+.progress{font:600 14px var(--f-body); color:var(--muted)}
+.bar-wrap{width:140px; height:6px; background:var(--soft); border-radius:3px; overflow:hidden}
+.bar-fill{height:100%; width:0; background:var(--blue); border-radius:3px}
+
+/* layout */
+.layout{display:grid; grid-template-columns:230px minmax(0,1fr); gap:56px; max-width:1280px; margin:0 auto; padding:0 24px}
+.toc{position:sticky; top:66px; align-self:start; max-height:calc(100vh - 80px); overflow:auto; padding:28px 0}
+.toc p{font:700 12px var(--f-body); letter-spacing:.06em; color:var(--muted); text-transform:uppercase; margin:0 0 8px 10px}
+.toc ol{list-style:none; margin:0; padding:0; counter-reset:t}
+.toc li{counter-increment:t}
+.toc a{display:flex; gap:8px; padding:5px 10px; border-radius:10px; color:var(--muted); text-decoration:none; font-size:14.5px; line-height:1.4}
+.toc a::before{content:counter(t, decimal-leading-zero); font:600 12px var(--f-mono); color:var(--muted); padding-top:2px}
+.toc a:hover{background:var(--soft); color:var(--ink)}
+.toc a.on{background:var(--blue-soft); color:var(--ink); font-weight:700}
+@media (max-width:1050px){ .layout{grid-template-columns:1fr; padding:0 18px} .toc{display:none} }
+article{min-width:0; max-width:900px; padding-bottom:60px}
+
+/* sections and prose */
+section{padding:52px 0 8px; display:flex; flex-direction:column; gap:18px; scroll-margin-top:70px}
+section + section{border-top:1px solid var(--line)}
+.prose{max-width:68ch; display:flex; flex-direction:column; gap:14px}
+.prose ul,.prose ol{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:6px}
+.lead{font-size:20px; line-height:1.6; color:var(--ink); max-width:62ch}
+.kts{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.kts-label{font:700 12px var(--f-body); letter-spacing:.06em; color:var(--muted); text-transform:uppercase; margin-right:4px}
+.kt{font:600 14px var(--f-body); border:1px dashed var(--blue); background:transparent; color:var(--blue-text); padding:4px 12px; border-radius:999px; cursor:pointer; display:inline-flex; gap:8px; align-items:center}
+.kt[aria-expanded="true"]{background:var(--blue-soft); border-style:solid}
+.kt-ar{font:600 15px var(--f-ar); color:var(--ink)}
+
+/* hero */
+.hero{display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:center; padding-top:48px}
+.hero-text{display:flex; flex-direction:column; gap:16px}
+.hero canvas{width:100%; max-width:380px; height:auto; justify-self:center}
+.meta-row{display:flex; flex-wrap:wrap; gap:10px}
+.meta-chip{font:600 13.5px var(--f-body); background:var(--surface); border:1px solid var(--line); color:var(--muted); padding:5px 12px; border-radius:999px}
+@media (max-width:760px){ .hero{grid-template-columns:1fr} }
+.outcomes{background:var(--surface); border-radius:var(--radius); padding:22px 26px; box-shadow:var(--shadow)}
+.outcomes ol{margin:8px 0 0; padding-left:22px; display:flex; flex-direction:column; gap:6px; color:var(--ink)}
+
+/* callouts */
+.callout{border-radius:var(--radius-sm); padding:16px 20px; max-width:68ch; display:flex; flex-direction:column; gap:6px}
+.callout b.lbl{font:700 13px var(--f-body); letter-spacing:.04em; text-transform:uppercase}
+.callout.key{background:var(--blue-soft); border-left:4px solid var(--blue)} .callout.key b.lbl{color:var(--blue-text)}
+.callout.mistake{background:var(--amber-soft); border-left:4px solid var(--amber)} .callout.mistake b.lbl{color:var(--amber-text)}
+.callout p{color:var(--ink)}
+.worked{background:var(--surface); border-radius:var(--radius-sm); padding:18px 22px; box-shadow:var(--shadow); max-width:68ch}
+.worked h3{font-size:17px; margin-bottom:8px}
+.worked ol{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:4px}
+.calc{font-family:var(--f-mono); font-size:15px; color:var(--ink)}
+details.check{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px 18px; max-width:68ch}
+details.check summary{cursor:pointer; font-weight:700; color:var(--ink); list-style:none; display:flex; gap:10px}
+details.check summary::before{content:"?"; flex:none; width:24px; height:24px; border-radius:50%; background:var(--blue); color:#FFFFFF; font:700 14px/24px var(--f-display); text-align:center}
+details.check[open] summary{margin-bottom:8px}
+details.check p{color:var(--text)}
+
+/* demos */
+.demo{background:var(--surface); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:14px}
+.demo-h{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.demo-h .eyebrow{color:var(--amber-text)}
+.demo-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; align-items:center}
+@media (max-width:720px){ .demo-grid{grid-template-columns:1fr} }
+.ctrls{display:flex; flex-direction:column; gap:12px}
+.ctrl{display:grid; grid-template-columns:90px 1fr 56px; gap:10px; align-items:center; font-weight:600; color:var(--ink); font-size:15px}
+.ctrl output{font:600 14px var(--f-mono); text-align:right; color:var(--muted)}
+input[type=range]{width:100%; accent-color:var(--blue)}
+select,input[type=number],input[type=text]{font:500 15px var(--f-body); color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 10px}
+input[type=color]{width:48px; height:36px; border:1px solid var(--line); border-radius:8px; background:var(--bg); padding:2px}
+.readout{display:flex; flex-wrap:wrap; gap:8px}
+.readout span{font:600 13.5px var(--f-mono); background:var(--soft); color:var(--ink); padding:5px 10px; border-radius:8px}
+.swatch{height:72px; border-radius:var(--radius-sm); border:1px solid var(--line)}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:var(--bg)}
+.seg button{font:600 14px var(--f-body); border:0; background:transparent; color:var(--muted); padding:7px 14px; cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.lightbox{border-radius:var(--radius-sm); aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; overflow:hidden}
+.lightbox svg{width:100%; height:100%}
+.strip{display:grid; grid-template-columns:repeat(6,1fr); gap:4px}
+.strip div{height:40px; border-radius:8px}
+.strip-label{font:600 13px var(--f-body); color:var(--muted); margin-top:-6px}
+.wheel-wrap{position:relative; width:240px; height:240px; justify-self:center}
+.wheel{width:240px; height:240px; border-radius:50%; background:conic-gradient(from 90deg, hsl(0 80% 55%), hsl(8 80% 55%), hsl(15 80% 55%), hsl(22 80% 55%), hsl(30 80% 55%), hsl(38 80% 55%), hsl(45 80% 48%), hsl(52 80% 48%), hsl(60 80% 48%), hsl(75 80% 48%), hsl(90 80% 48%), hsl(105 80% 48%), hsl(120 80% 48%), hsl(150 80% 48%), hsl(180 80% 55%), hsl(210 80% 55%), hsl(240 80% 55%), hsl(250 80% 55%), hsl(260 80% 55%), hsl(270 80% 55%), hsl(280 80% 55%), hsl(300 80% 55%), hsl(320 80% 55%), hsl(340 80% 55%), hsl(360 80% 55%)); position:relative}
+.wheel::after{content:""; position:absolute; inset:58px; border-radius:50%; background:var(--surface)}
+.marker{position:absolute; width:22px; height:22px; border-radius:50%; border:3px solid #FFFFFF; box-shadow:0 0 0 2px #13213A; transform:translate(-50%,-50%)}
+.palette{display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:8px}
+.palette div{border-radius:12px; height:64px; display:flex; align-items:flex-end; padding:6px 8px; font:600 12px var(--f-mono)}
+.mock{border-radius:var(--radius-sm); overflow:hidden; border:1px solid var(--line)}
+.mock-top{padding:12px 16px; font:700 15px var(--f-display)}
+.mock-body{padding:16px; display:flex; flex-direction:column; gap:8px}
+.mock-btn{align-self:flex-start; padding:7px 14px; border-radius:999px; font:700 13px var(--f-body)}
+.ratio{font:650 40px/1 var(--f-display); color:var(--ink)}
+.pf{display:flex; gap:8px; flex-wrap:wrap}
+.pf span{font:700 13px var(--f-body); padding:5px 11px; border-radius:999px}
+.pf .ok{background:var(--good-soft); color:var(--good)} .pf .no{background:var(--bad-soft); color:var(--bad)}
+.sample{border-radius:var(--radius-sm); padding:18px; border:1px solid var(--line)}
+.sample .s1{font-size:16px} .sample .s2{font:700 24px var(--f-display)}
+canvas.demo-canvas{width:100%; height:auto; border-radius:var(--radius-sm); display:block; image-rendering:pixelated; background:#FFFFFF}
+.big-num{font:650 30px/1.1 var(--f-display); color:var(--ink)}
+.out-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.out-grid div{background:var(--soft); border-radius:12px; padding:12px 14px}
+.out-grid small{display:block; color:var(--muted); font-size:13px}
+@media (max-width:600px){ .out-grid{grid-template-columns:1fr} }
+.inputs{display:flex; flex-wrap:wrap; gap:12px; align-items:end}
+.inputs label{display:flex; flex-direction:column; gap:4px; font:700 13.5px var(--f-body); color:var(--ink)}
+.inputs input[type=number]{width:120px}
+
+/* tables, quiz, glossary */
+.table-wrap{overflow-x:auto; border-radius:var(--radius-sm); background:var(--surface); box-shadow:var(--shadow)}
+table{border-collapse:collapse; width:100%; font-size:15.5px}
+th{background:var(--soft); color:var(--ink); text-align:left; font-weight:700; padding:11px 14px}
+td{padding:10px 14px; border-top:1px solid var(--line); color:var(--ink); vertical-align:top}
+td[lang="ar"],th[lang="ar"]{font-family:var(--f-ar); text-align:right; font-size:16.5px}
+.quiz{display:flex; flex-direction:column; gap:12px}
+.q{border:0; background:var(--surface); border-radius:var(--radius-sm); padding:16px 20px; margin:0; display:flex; flex-direction:column; gap:4px; box-shadow:var(--shadow)}
+.q legend{font-weight:700; color:var(--ink); padding:0; margin-bottom:6px}
+.opt{display:flex; gap:10px; align-items:flex-start; padding:7px 10px; border-radius:10px; cursor:pointer; color:var(--ink)}
+.opt:hover{background:var(--bg)}
+.opt.right{background:var(--good-soft)} .opt.right span::after{content:"  ✓ correct"; color:var(--good); font-weight:700}
+.opt.wrong{background:var(--bad-soft)} .opt.wrong span::after{content:"  ✗ your answer"; color:var(--bad); font-weight:700}
+.why{color:var(--ink); font-size:15px; background:var(--bg); padding:10px 14px; border-radius:10px}
+.btn{font:700 15px var(--f-body); border:1px solid transparent; background:var(--blue); color:#FFFFFF; padding:0 22px; height:44px; border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; gap:8px}
+.btn.ghost{background:var(--surface); color:var(--ink); border-color:var(--line)}
+.actions{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+.summary{background:var(--night); color:var(--on-night-muted); border-radius:var(--radius); padding:24px 28px}
+.summary h3{color:var(--on-night); margin-bottom:10px}
+.summary ol{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:8px}
+.summary b{color:var(--on-night)}
+.lab-bar{display:flex; height:40px; border-radius:12px; overflow:hidden; gap:3px}
+.lab-bar span{display:flex; align-items:center; justify-content:center; font:700 13px var(--f-display); color:#13213A; background:#DCE2EA}
+.lab-bar .alt{background:#C8D2E0} .lab-bar .support{background:var(--amber)}
+footer{background:var(--night); color:var(--on-night-muted); margin-top:30px}
+.foot-in{max-width:1280px; margin:0 auto; padding:24px; display:flex; flex-wrap:wrap; gap:10px 28px; justify-content:space-between; font-size:14px}
+footer b{color:var(--on-night)}
+
+.part{background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 24px; display:flex; flex-direction:column; gap:12px}
+.part-h{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.part-h h3{font-size:19px}
+.mins{font:700 13px var(--f-body); background:var(--soft); color:var(--ink); padding:4px 10px; border-radius:999px}
+.part ol.stepsx{margin:0; padding-left:0; list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:10px}
+.part ol.stepsx > li{counter-increment:s; display:grid; grid-template-columns:38px 1fr; gap:10px; align-items:start; max-width:76ch}
+.part ol.stepsx > li::before{content:attr(data-n); font:700 13px var(--f-mono); color:var(--blue-text); background:var(--blue-soft); border-radius:8px; padding:3px 0; text-align:center}
+.part ol.stepsx > li > div{display:flex; flex-direction:column; gap:4px}
+.menu{font:600 .92em var(--f-mono); background:var(--soft); color:var(--ink); padding:1px 6px; border-radius:6px; white-space:nowrap}
+.expect{font-size:15px; color:var(--muted)}
+.expect::before{content:"You should see: "; font-weight:700; color:var(--ink)}
+.checkpoint{background:var(--good-soft); color:var(--ink); border-radius:12px; padding:10px 14px; font-size:15px}
+.checkpoint b{color:var(--good)}
+.prep{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+@media (max-width:760px){ .prep{grid-template-columns:1fr} }
+.prep div{background:var(--surface); border-radius:var(--radius-sm); box-shadow:var(--shadow); padding:14px 16px; font-size:15px}
+.prep b{display:block; color:var(--ink); margin-bottom:4px}
+pre.tpl{font:500 13.5px/1.6 var(--f-mono); background:var(--night); color:var(--on-night); padding:14px 16px; border-radius:12px; overflow-x:auto; margin:0; white-space:pre}
+.checklist{background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 22px; display:flex; flex-direction:column; gap:8px}
+.checklist label{display:flex; gap:10px; align-items:flex-start; color:var(--ink); font-size:16px; cursor:pointer}
+.checklist input{margin-top:5px; accent-color:var(--blue); width:18px; height:18px}
+.checklist .count{font:700 14px var(--f-body); color:var(--muted)}
+.support-note{background:var(--amber-soft); border-left:4px solid var(--amber); border-radius:12px; padding:14px 18px; color:var(--ink); max-width:76ch}
+.crumbs{display:flex; gap:6px; align-items:center; margin-left:10px; flex-wrap:wrap}
+.crumbs a,.crumbs span{font:600 14px var(--f-body); color:var(--muted); text-decoration:none; padding:6px 10px; border-radius:999px}
+.crumbs a:hover{background:var(--soft); color:var(--ink)}
+.crumbs .home{color:var(--blue-text)}
+.crumbs span[aria-disabled]{opacity:.55}
+.pager{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding:30px 0 0}
+.pager a,.pager span{background:var(--surface); border-radius:var(--radius-sm); box-shadow:var(--shadow); padding:14px 18px; text-decoration:none; color:var(--ink); display:flex; flex-direction:column; gap:2px}
+.pager small{color:var(--muted); font-size:13px}
+.pager b{font:700 15px var(--f-body)}
+.pager span{opacity:.6; box-shadow:none; background:var(--soft)}
+.pager .mid{text-align:center} .pager .nx{text-align:right}
+@media (max-width:640px){ .pager{grid-template-columns:1fr} .pager .mid,.pager .nx{text-align:left} }
+
+.tabs{position:sticky; top:57px; z-index:15; background:color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter:blur(8px); display:flex; gap:8px; flex-wrap:wrap; padding:12px 0; border-bottom:1px solid var(--line)}
+.tab{font:700 15px var(--f-body); padding:9px 18px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--muted); text-decoration:none; display:inline-flex; gap:8px; align-items:center}
+.tab small{font:600 12.5px var(--f-body); opacity:.75}
+.tab:hover{color:var(--ink); border-color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.tabpanel > section:first-child{border-top:0}
+.next-tab{display:flex; justify-content:flex-end; padding:32px 0 0}
+.next-tab a{text-decoration:none}
+.sources ol{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:8px; max-width:76ch}
+.sources li{color:var(--text)}
+.toc li[hidden]{display:none}
+section{scroll-margin-top:130px}
+
+.ar-btn{align-self:flex-start; font:600 15px var(--f-ar); border:1px solid var(--line); background:var(--surface); color:var(--blue-text); padding:7px 16px; border-radius:999px; cursor:pointer; display:inline-flex; gap:8px; align-items:center}
+.ar-btn::before{content:"ع"; font:700 13px var(--f-ar); width:22px; height:22px; border-radius:50%; background:var(--blue-soft); color:var(--blue-text); display:inline-grid; place-items:center}
+.ar-btn[aria-expanded="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.ar-btn[aria-expanded="true"]::before{background:var(--bg); color:var(--ink)}
+.ar-all{font:600 14.5px var(--f-ar)}
+.ar-panel{font-family:var(--f-ar); font-size:17px; line-height:1.95; color:var(--text); background:var(--surface); border-right:4px solid var(--blue); border-radius:var(--radius-sm); box-shadow:var(--shadow); padding:18px 24px; max-width:72ch; display:flex; flex-direction:column; gap:10px}
+.ar-panel[hidden]{display:none !important}
+.ar-panel p, .ar-panel li{color:var(--text); font-size:17px}
+.ar-panel b{color:var(--ink)}
+.ar-panel h4{font:700 17px var(--f-ar); color:var(--ink); margin:0}
+.ar-panel ul, .ar-panel ol{margin:0; padding-right:22px; padding-left:0; display:flex; flex-direction:column; gap:6px}
+.ar-panel [lang="en"]{font-family:var(--f-body); font-size:.9em; color:var(--muted)}
+.ar-panel .ltr{font-family:var(--f-body); unicode-bidi:isolate; direction:ltr; white-space:nowrap}
+.ar-panel .calc{font-family:var(--f-mono); font-size:15px; text-align:left; color:var(--ink)}
+.ar-worked{background:var(--soft); border-radius:12px; padding:12px 16px}
+.ar-note{border-radius:12px; padding:12px 16px}
+.ar-note.key{background:var(--blue-soft)} .ar-note.mistake{background:var(--amber-soft)}
+.ar-note b{font:700 15px var(--f-ar)} .ar-note.key b{color:var(--blue-text)} .ar-note.mistake b{color:var(--amber-text)}
+.ar-check{border-top:1px dashed var(--line); padding-top:10px}
+.ar-table{border-collapse:collapse; width:100%; font-size:15.5px}
+.ar-table th, .ar-table td{border-bottom:1px solid var(--line); padding:6px 8px; text-align:right}
+.ar-foot{font-size:14px !important; color:var(--muted) !important}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="top-in">
+<a class="brand" href="#top"><i aria-hidden="true"></i>IT 280 · Week 3</a><nav class="crumbs" aria-label="Course navigation"><a class="home" href="../">Course home</a><a href="../week02/">‹ Week 2</a><a href="../week04/">Week 4 ›</a></nav><span class="sp"></span>
+<span class="progress" id="prog-label">0% read</span><div class="bar-wrap" aria-hidden="true"><div class="bar-fill" id="prog"></div></div>
+</div></header>
+
+<div class="layout">
+<nav class="toc" aria-label="Contents"><p>On this page</p><ol><li data-tab="learn"><a href="#light">Why three colours are enough for a screen</a></li><li data-tab="learn"><a href="#rgb">How a computer stores a colour</a></li><li data-tab="learn"><a href="#cmyk">CMYK: subtractive colour for ink and paper</a></li><li data-tab="learn"><a href="#hsv">Colour the way designers think</a></li><li data-tab="learn"><a href="#harmony">The colour wheel and six harmony schemes</a></li><li data-tab="learn"><a href="#using">Proportion, meaning and contrast</a></li><li data-tab="learn"><a href="#pixels">How many colours can one pixel hold?</a></li><li data-tab="learn"><a href="#size">How big is an image file?</a></li><li data-tab="learn"><a href="#resolution">Resolution, PPI and printing</a></li><li data-tab="learn"><a href="#aliasing">Why edges look jagged, and how to smooth them</a></li><li data-tab="learn"><a href="#gamut">Colour spaces and gamut</a></li><li data-tab="learn"><a href="#summary">What to remember</a></li><li data-tab="practise"><a href="#mistakes">Common mistakes to avoid</a></li><li data-tab="practise"><a href="#check">Six questions, marked on the page</a></li><li data-tab="lab"><a href="#lab">Palette, contrast and resolution</a></li><li data-tab="glossary"><a href="#glossary">Key terms in English and Arabic</a></li><li data-tab="glossary"><a href="#sources">Sources for this week</a></li></ol></nav>
+
+<article id="main">
+<nav class="tabs" role="tablist" aria-label="Week sections"><a class="tab" role="tab" href="#learn" data-tab="learn" aria-selected="false">Learn <small>11 topics</small></a><a class="tab" role="tab" href="#practise" data-tab="practise" aria-selected="false">Practise <small>quiz</small></a><a class="tab" role="tab" href="#lab" data-tab="lab" aria-selected="false">Lab <small>120 min</small></a><a class="tab" role="tab" href="#glossary" data-tab="glossary" aria-selected="false">Glossary <small>EN · AR</small></a></nav><div class="tabpanel" id="panel-learn" data-tab="learn" role="tabpanel" aria-label="Learn"><section class="hero" id="top" aria-labelledby="h-top">
+<div class="hero-text">
+<p class="eyebrow">IT 280 · Computer Graphics and Multimedia · Week 3</p>
+<h1 id="h-top">Colour and <em>digital images</em></h1>
+<p class="lead">How screens make colour from light, how computers store it as numbers, how designers choose colours that work together, and what resolution and bit depth really mean.</p>
+<div class="meta-row"><button type="button" class="meta-chip ar-btn ar-all" id="ar-all" aria-pressed="false" lang="ar">عرض الشرح العربي لكل الأقسام</button><span class="meta-chip">About 50 minutes to read and try</span><span class="meta-chip">Missed the lecture? Read top to bottom</span><span class="meta-chip">CLO 1.1 · 2.1</span></div>
+</div>
+<canvas id="rgbcube" width="760" height="720" role="img" aria-label="The RGB colour cube: black, red, green, blue, cyan, magenta, yellow and white at its corners"></canvas>
+</section><section aria-labelledby="h-out" style="border-top:0; padding-top:8px">
+<div class="outcomes"><h3 id="h-out">After this week you can</h3><ol>
+<li>Explain why screens use red, green and blue light, and why printers use cyan, magenta, yellow and black.</li>
+<li>Read and convert colour values between RGB, hex and HSV.</li>
+<li>Build a palette with a named harmony scheme and apply the 60-30-10 rule.</li>
+<li>Check text contrast against the accessibility standard (4.5 : 1).</li>
+<li>Calculate an image’s size in pixels and bytes from its resolution and bit depth.</li>
+<li>Explain sampling, aliasing and anti-aliasing.</li>
+</ol></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-out" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-out" lang="ar" dir="rtl" hidden><h4>بعد هذا الأسبوع ستكون قادرًا على أن:</h4><ol>
+<li>تشرح لماذا تستخدم الشاشات الضوء الأحمر والأخضر والأزرق، ولماذا تستخدم الطابعات الأحبار السماوي والأرجواني والأصفر والأسود.</li>
+<li>تقرأ قيم الألوان وتحوّل بينها في صيغ <span dir="ltr" class="ltr">RGB</span> والرمز الست عشري و<span dir="ltr" class="ltr">HSV</span>.</li>
+<li>تبني لوحة ألوان وفق مخطط انسجام مسمّى، وتطبّق قاعدة <span dir="ltr" class="ltr">60-30-10</span>.</li>
+<li>تتحقّق من تباين النص وفق معيار إتاحة الوصول <span dir="ltr" class="ltr">(4.5 : 1)</span>.</li>
+<li>تحسب حجم الصورة بالبكسل وبالبايت من دقتها وعمق البت فيها.</li>
+<li>تشرح أخذ العيّنات والتسنّن وتنعيم الحواف.</li></ol><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+</section><section id="light" aria-labelledby="h-light">
+<p class="eyebrow">01 · Colour starts as light</p><h2 id="h-light">Why three colours are enough for a screen</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Additive colour<span class="kt-ar" lang="ar" dir="rtl" hidden>المزج الجمعي للألوان</span></button><button type="button" class="kt" aria-expanded="false">Primary colours<span class="kt-ar" lang="ar" dir="rtl" hidden>الألوان الأساسية</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-light" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-light" lang="ar" dir="rtl" hidden><p>اللون ليس صفة في الجسم نفسه، بل هو تفسير الدماغ للضوء. والضوء المرئي نطاق ضيّق من الإشعاع الكهرومغناطيسي، يمتد من نحو <span dir="ltr" class="ltr">380</span> نانومترًا (البنفسجي) إلى نحو <span dir="ltr" class="ltr">700</span> نانومتر (الأحمر).</p>
+<p>في مؤخرة العين ثلاثة أنواع من الخلايا الحساسة للون تُسمّى المخاريط (<span lang="en">cones</span>): نوع يستجيب أكثر للأطوال الموجية الطويلة (الأحمر)، ونوع للمتوسطة (الأخضر)، ونوع للقصيرة (الأزرق). وكل لون تراه هو نتيجة مقارنة الدماغ لشدّة تحفيز هذه الأنواع الثلاثة.</p>
+<p>والشاشة تستفيد من ذلك؛ فكل بكسل (<span lang="en">pixel</span>) مكوّن من ثلاثة مصابيح دقيقة تُسمّى البكسلات الفرعية (<span lang="en">sub-pixels</span>): أحمر وأخضر وأزرق. وبتغيير سطوع كل منها تحفّز الشاشة المخاريط الثلاثة بنسب مختلفة، فترى ملايين الألوان. لا يحدث أي خلط فيزيائي؛ فالخلط يحدث في عينك.</p>
+<p>هذا ما يُسمّى المزج الجمعي للألوان (<span lang="en">additive colour</span>): تبدأ من الأسود (كل المصابيح مطفأة) ثم تضيف الضوء. الضوء الأحمر والأخضر معًا يبدوان أصفر، والثلاثة بكامل شدتها تبدو أبيض.</p><div class="ar-check"><p><b>تحقّق من فهمك:</b> اضبط الأحمر والأخضر على <span dir="ltr" class="ltr">255</span> والأزرق على <span dir="ltr" class="ltr">0</span>. ما اللون الذي يظهر حيث تتداخل الدوائر الثلاث، ولماذا؟</p><p><b>الإجابة:</b> الأصفر. عند إطفاء الضوء الأزرق لا يصل إلى عينك إلا الضوء الأحمر والأخضر، ويقرأ الدماغ هذا المزيج أصفر. لا يصدر أي ضوء أصفر فعليًا.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>Colour is not a property of an object. It is how your brain interprets light. Visible light is a narrow band of electromagnetic radiation, from about 380 nanometres (violet) to about 700 nanometres (red).</p>
+<p>The back of your eye has three kinds of colour-sensitive cells, called cones. One kind responds most to long wavelengths (reds), one to medium wavelengths (greens) and one to short wavelengths (blues). Every colour you see is your brain comparing how strongly those three kinds of cone are stimulated.</p>
+<p>A screen takes advantage of this. Each pixel is made of three tiny lights, called sub-pixels: one red, one green and one blue. By changing how bright each one is, the screen stimulates your three kinds of cone in different proportions, and you see millions of different colours. Nothing is mixed physically; the mixing happens in your eye.</p>
+<p>This is called <b>additive colour</b>: you start from black (all lights off) and add light. Red and green light together look yellow. All three at full strength look white.</p>
+</div>
+<div class="demo" id="demo-add">
+<div class="demo-h"><p class="eyebrow">Try it · mix light</p><span class="muted">Move the sliders. Where the circles overlap, the light adds up.</span></div>
+<div class="demo-grid">
+<div class="lightbox" style="background:#000000"><svg viewBox="0 0 300 225" aria-label="Three overlapping circles of red, green and blue light"><g style="mix-blend-mode:normal; isolation:isolate"><circle id="cR" cx="120" cy="90" r="64" style="mix-blend-mode:screen"/><circle id="cG" cx="180" cy="90" r="64" style="mix-blend-mode:screen"/><circle id="cB" cx="150" cy="140" r="64" style="mix-blend-mode:screen"/></g></svg></div>
+<div class="ctrls">
+<label class="ctrl" for="ar">Red <input type="range" id="ar" min="0" max="255" value="255"><output id="arv">255</output></label>
+<label class="ctrl" for="ag">Green <input type="range" id="ag" min="0" max="255" value="255"><output id="agv">255</output></label>
+<label class="ctrl" for="ab">Blue <input type="range" id="ab" min="0" max="255" value="255"><output id="abv">255</output></label>
+<div class="swatch" id="add-sw" aria-hidden="true"></div>
+<div class="readout"><span id="add-rgb"></span><span id="add-hex"></span><span id="add-gl"></span></div>
+</div></div></div>
+<details class="check"><summary>Set red and green to 255 and blue to 0. What colour appears where all three circles overlap, and why?</summary><p>Yellow. With the blue light off, only red and green light reach your eye, and your brain reads that combination as yellow. No yellow light is actually emitted.</p></details>
+</section><section id="rgb" aria-labelledby="h-rgb">
+<p class="eyebrow">02 · RGB numbers and hex codes</p><h2 id="h-rgb">How a computer stores a colour</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Channel<span class="kt-ar" lang="ar" dir="rtl" hidden>قناة اللون</span></button><button type="button" class="kt" aria-expanded="false">Hexadecimal<span class="kt-ar" lang="ar" dir="rtl" hidden>النظام الست عشري</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-rgb" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-rgb" lang="ar" dir="rtl" hidden><p>في نموذج <span dir="ltr" class="ltr">RGB</span> يُمثَّل اللون بثلاثة أعداد: سطوع الضوء الأحمر والأخضر والأزرق. وكل عدد منها يُسمّى قناة اللون (<span lang="en">channel</span>). تخزّن معظم الصور كل قناة في <span dir="ltr" class="ltr">8</span> بتات، فتعطي <span dir="ltr" class="ltr">2<sup>8</sup> = 256</span> مستوى، تُكتب من <span dir="ltr" class="ltr">0</span> إلى <span dir="ltr" class="ltr">255</span>. وثلاث قنوات بثماني بتات تعني <span dir="ltr" class="ltr">24</span> بتًا لكل بكسل، أي <span dir="ltr" class="ltr">2<sup>24</sup> = 16,777,216</span> لونًا ممكنًا.</p>
+<p>ويمكن كتابة اللون نفسه بثلاث طرق شائعة:</p>
+<ul><li><b>العشري</b>، كما في برامج تحرير الصور: <span dir="ltr" class="ltr">rgb(226, 160, 74)</span></li>
+<li><b>الست عشري</b> (<span lang="en">hexadecimal</span>)، كما في أدوات الويب والتصميم: <span dir="ltr" class="ltr">#E2A04A</span>. كل زوج من الخانات الست عشرية قناة واحدة، من <span dir="ltr" class="ltr">00</span> (أي 0) إلى <span dir="ltr" class="ltr">FF</span> (أي 255).</li>
+<li><b>الأعداد العشرية المُطبَّعة</b> (<span lang="en">normalised floats</span>)، كما في <span dir="ltr" class="ltr">OpenGL</span> ولغات التظليل: <span dir="ltr" class="ltr">glColor3f(0.886, 0.627, 0.290)</span>. تُقسَم كل قناة على <span dir="ltr" class="ltr">255</span> فتصبح قيمتها بين <span dir="ltr" class="ltr">0.0</span> و<span dir="ltr" class="ltr">1.0</span>.</li></ul><div class="ar-worked"><h4>مثال محلول · من <span dir="ltr" class="ltr">RGB</span> إلى الست عشري وإلى الأعداد العشرية</h4><ol><li>نبدأ من <span dir="ltr" class="ltr">rgb(226, 160, 74)</span>.</li><li>الأحمر: <span dir="ltr" class="ltr">226 = 14 × 16 + 2</span>، فالخانتان الست عشريتان <span dir="ltr" class="ltr">E</span> و<span dir="ltr" class="ltr">2</span>، أي <span dir="ltr" class="ltr">E2</span>.</li><li>الأخضر: <span dir="ltr" class="ltr">160 = 10 × 16 + 0</span>، أي <span dir="ltr" class="ltr">A0</span>. الأزرق: <span dir="ltr" class="ltr">74 = 4 × 16 + 10</span>، أي <span dir="ltr" class="ltr">4A</span>. إذن الرمز <span dir="ltr" class="ltr">#E2A04A</span>.</li><li>الأعداد العشرية: <span dir="ltr" class="ltr">226 ÷ 255 = 0.886</span>، و<span dir="ltr" class="ltr">160 ÷ 255 = 0.627</span>، و<span dir="ltr" class="ltr">74 ÷ 255 = 0.290</span>.</li></ol></div><div class="ar-note mistake"><b>خطأ شائع</b><p>القول إن الألوان العشرية من <span dir="ltr" class="ltr">0.0</span> إلى <span dir="ltr" class="ltr">1.0</span> لها <span dir="ltr" class="ltr">100</span> خطوة فقط <span dir="ltr" class="ltr">(0.00, 0.01 … 1.00)</span>. هذا غير صحيح؛ فالعدد العشري يمكن أن يأخذ أي قيمة بينهما مثل <span dir="ltr" class="ltr">0.627</span>. ما يحدّ عدد الخطوات هو الشاشة وملف الصورة؛ فالشاشة القياسية ذات الثماني بتات تعرض <span dir="ltr" class="ltr">256</span> مستوى لكل قناة، فتُخزَّن <span dir="ltr" class="ltr">0.627</span> على أنها المستوى <span dir="ltr" class="ltr">160</span>.</p></div><div class="ar-check"><p><b>تحقّق من فهمك:</b> ما قيمة <span dir="ltr" class="ltr">#00FFFF</span> بصيغة <span dir="ltr" class="ltr">RGB</span> العشرية، وما لونه؟</p><p><b>الإجابة:</b> <span dir="ltr" class="ltr">rgb(0, 255, 255)</span>: لا أحمر، وأخضر كامل، وأزرق كامل. الضوء الأخضر والأزرق معًا يبدوان سماويًا (<span lang="en">cyan</span>).</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>In the RGB model, a colour is three numbers: how bright the red, green and blue lights are. Each number is a <b>channel</b>. Most images store each channel in 8 bits, which gives 2<sup>8</sup> = 256 levels, written 0 to 255. Three channels of 8 bits make 24 bits per pixel, and 2<sup>24</sup> = 16,777,216 possible colours.</p>
+<p>The same colour can be written in three common ways:</p>
+<ul>
+<li><b>Decimal</b>, as in image editors: <code>rgb(226, 160, 74)</code></li>
+<li><b>Hexadecimal</b>, as in web and design tools: <code>#E2A04A</code>. Each pair of hex digits is one channel, from <code>00</code> (0) to <code>FF</code> (255).</li>
+<li><b>Normalised floats</b>, as in OpenGL and shaders: <code>glColor3f(0.886, 0.627, 0.290)</code>. Each channel is divided by 255, so it runs from 0.0 to 1.0.</li>
+</ul>
+</div>
+<div class="worked"><h3>Worked example · RGB to hex and to floats</h3><ol>
+<li>Start with <code>rgb(226, 160, 74)</code>.</li>
+<li>Red: 226 = 14 × 16 + 2 → hex digits E and 2 → <code>E2</code>.</li>
+<li>Green: 160 = 10 × 16 + 0 → <code>A0</code>. Blue: 74 = 4 × 16 + 10 → <code>4A</code>. So the hex code is <code>#E2A04A</code>.</li>
+<li>Floats: 226 ÷ 255 = 0.886, 160 ÷ 255 = 0.627, 74 ÷ 255 = 0.290.</li>
+</ol></div>
+<div class="callout mistake"><b class="lbl">Common mistake</b><p>“Float colours from 0.0 to 1.0 have only 100 steps (0.00, 0.01 … 1.00).” Not true: a float can hold any value in between, such as 0.627. What limits the steps is the screen and the image file. A standard 8-bit display still shows 256 levels per channel, so 0.627 is stored as level 160.</p></div>
+<details class="check"><summary>What is <code>#00FFFF</code> in decimal RGB, and what colour is it?</summary><p><code>rgb(0, 255, 255)</code>: no red, full green, full blue. Green and blue light together look cyan.</p></details>
+</section><section id="cmyk" aria-labelledby="h-cmyk">
+<p class="eyebrow">03 · Print</p><h2 id="h-cmyk">CMYK: subtractive colour for ink and paper</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Subtractive colour<span class="kt-ar" lang="ar" dir="rtl" hidden>المزج الطرحي للألوان</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-cmyk" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-cmyk" lang="ar" dir="rtl" hidden><p>الورق لا يُصدر ضوءًا بل يعكسه. فالورق الأبيض يعكس كل الضوء الساقط عليه، وكل حبر يمتص جزءًا من هذا الضوء، أي يطرحه. الحبر السماوي يمتص الأحمر، والأرجواني يمتص الأخضر، والأصفر يمتص الأزرق. هذا هو المزج الطرحي للألوان (<span lang="en">subtractive colour</span>): تبدأ من الأبيض، وكل حبر تضيفه يُنقص الضوء فتصبح النتيجة أغمق.</p>
+<p>نظريًا، يمتص السماوي والأرجواني والأصفر معًا كل الضوء فينتج الأسود. أما عمليًا فينتج بنيٌّ داكن عكر مع هدر في الحبر، لذلك تضيف الطابعات حبرًا رابعًا هو الأسود، ويُرمز له بـ <span dir="ltr" class="ltr">K</span> (من <span lang="en">key</span>). ولهذا يُسمّى نموذج الطباعة <span dir="ltr" class="ltr">CMYK</span>.</p>
+<p>وهذا يفسّر الألوان الأساسية التي تعلّمتها في حصة الفنون: الأحمر والأصفر والأزرق هي صيغة الرسّامين للألوان الأساسية الطرحية. فالشاشات والضوء تستخدم الأحمر والأخضر والأزرق، والطلاء والطباعة تستخدم السماوي والأرجواني والأصفر.</p><div class="ar-check"><p><b>تحقّق من فهمك:</b> يرسل مصمم ملصقًا زاهيًا مشبّعًا بصيغة <span dir="ltr" class="ltr">RGB</span> إلى المطبعة، فيخرج المطبوع باهتًا. لماذا؟</p><p><b>الإجابة:</b> الحبر على الورق لا يستطيع إنتاج كل الألوان التي تُصدرها الشاشة. فأكثر ألوان الشاشة سطوعًا وتشبّعًا تقع خارج نطاق ألوان الطابعة (انظر القسم 11)، فتُحوَّل إلى أقرب الألوان التي تستطيع الأحبار إنتاجها.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>Paper does not emit light; it reflects it. White paper reflects all the light falling on it. Each ink absorbs, or subtracts, part of that light. Cyan ink absorbs red, magenta ink absorbs green and yellow ink absorbs blue. This is <b>subtractive colour</b>: you start from white and every ink you add removes light, so the result gets darker.</p>
+<p>In theory, cyan, magenta and yellow together absorb everything and make black. In practice they make a muddy dark brown and waste ink, so printers add a fourth ink, black, written K (for “key”). That is why the print model is called <b>CMYK</b>.</p>
+<p>This also explains the primary colours you learned in art class: red, yellow and blue are the painter’s version of the subtractive primaries. Screens and light use red, green and blue; paint and print use cyan, magenta and yellow.</p>
+</div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · mix ink</p><span class="muted">Each ink removes one part of the light. More ink, darker result.</span></div>
+<div class="demo-grid">
+<div class="lightbox" style="background:#FFFFFF; border:1px solid var(--line)"><svg viewBox="0 0 300 225" aria-label="Three overlapping circles of cyan, magenta and yellow ink on white"><g style="isolation:isolate"><circle id="cC" cx="120" cy="90" r="64" style="mix-blend-mode:multiply"/><circle id="cM" cx="180" cy="90" r="64" style="mix-blend-mode:multiply"/><circle id="cY" cx="150" cy="140" r="64" style="mix-blend-mode:multiply"/></g></svg></div>
+<div class="ctrls">
+<label class="ctrl" for="sc">Cyan <input type="range" id="sc" min="0" max="100" value="100"><output id="scv">100%</output></label>
+<label class="ctrl" for="sm">Magenta <input type="range" id="sm" min="0" max="100" value="100"><output id="smv">100%</output></label>
+<label class="ctrl" for="sy">Yellow <input type="range" id="sy" min="0" max="100" value="100"><output id="syv">100%</output></label>
+<p class="muted">Where all three overlap you get a dark brown-black, not a clean black. That is why printers add a separate black (K) ink.</p>
+</div></div></div>
+<div class="table-wrap"><table><thead><tr><th></th><th>Additive (RGB)</th><th>Subtractive (CMYK)</th></tr></thead><tbody>
+<tr><td>Used by</td><td>Screens, projectors, cameras, lights</td><td>Printers, paint, ink on paper</td></tr>
+<tr><td>Starts from</td><td>Black (no light)</td><td>White (blank paper)</td></tr>
+<tr><td>Adding a colour</td><td>Adds light, gets brighter</td><td>Absorbs light, gets darker</td></tr>
+<tr><td>All primaries together</td><td>White</td><td>Near black (so K is added)</td></tr></tbody></table></div>
+<details class="check"><summary>A designer sends a bright, saturated RGB poster to a printer and the print looks duller. Why?</summary><p>Ink on paper cannot reproduce every colour a screen can emit. The brightest, most saturated screen colours are outside the printer’s range (its gamut, see section 11), so they are converted to the nearest colours the inks can make.</p></details>
+</section><section id="hsv" aria-labelledby="h-hsv">
+<p class="eyebrow">04 · HSV</p><h2 id="h-hsv">Colour the way designers think</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Hue<span class="kt-ar" lang="ar" dir="rtl" hidden>صبغة اللون</span></button><button type="button" class="kt" aria-expanded="false">Saturation<span class="kt-ar" lang="ar" dir="rtl" hidden>التشبّع</span></button><button type="button" class="kt" aria-expanded="false">Value<span class="kt-ar" lang="ar" dir="rtl" hidden>القيمة، السطوع</span></button><button type="button" class="kt" aria-expanded="false">Tint, tone, shade<span class="kt-ar" lang="ar" dir="rtl" hidden>التفتيح، التدرّج الرمادي، التعتيم</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-hsv" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-hsv" lang="ar" dir="rtl" hidden><p>نموذج <span dir="ltr" class="ltr">RGB</span> هو طريقة الحاسب في تخزين اللون، لكنه صعب على البشر. فإذا أردت «الأزرق نفسه لكن أفتح»، فليس واضحًا أي الأعداد الثلاثة تغيّر. أما نموذج <span dir="ltr" class="ltr">HSV</span> فيصف الألوان نفسها بثلاث خصائص يفهمها الناس:</p>
+<ul><li><b>صبغة اللون</b> (<span lang="en">Hue</span>، من <span dir="ltr" class="ltr">0</span> إلى <span dir="ltr" class="ltr">360°</span>): أيّ عائلة لونية هو، وتُقاس بزاوية على عجلة الألوان. <span dir="ltr" class="ltr">0°</span> أحمر، و<span dir="ltr" class="ltr">120°</span> أخضر، و<span dir="ltr" class="ltr">240°</span> أزرق.</li>
+<li><b>التشبّع</b> (<span lang="en">Saturation</span>، من <span dir="ltr" class="ltr">0</span> إلى <span dir="ltr" class="ltr">100%</span>): مدى نقاء اللون وحدّته. <span dir="ltr" class="ltr">100%</span> هو اللون الزاهي، و<span dir="ltr" class="ltr">0%</span> رمادي.</li>
+<li><b>القيمة أو السطوع</b> (<span lang="en">Value</span>، من <span dir="ltr" class="ltr">0</span> إلى <span dir="ltr" class="ltr">100%</span>): مدى سطوع اللون. و<span dir="ltr" class="ltr">0%</span> أسود دائمًا.</li></ul>
+<p>نموذج <span dir="ltr" class="ltr">HSV</span> ليس مجموعة ألوان مختلفة، بل طريقة أخرى لوصف ألوان <span dir="ltr" class="ltr">RGB</span> نفسها، والبرامج تحوّل بين الاثنين فورًا. وله نموذج قريب هو <span dir="ltr" class="ltr">HSL</span>، يستخدم الإضاءة (<span lang="en">lightness</span>) بدل القيمة: في <span dir="ltr" class="ltr">HSL</span> تعني الإضاءة <span dir="ltr" class="ltr">100%</span> الأبيض دائمًا، أما في <span dir="ltr" class="ltr">HSV</span> فالقيمة <span dir="ltr" class="ltr">100%</span> هي أسطع نسخة من الصبغة.</p>
+<p>ومن ممارسة الفن تأتي ثلاث كلمات مفيدة: التفتيح (<span lang="en">tint</span>) لون ممزوج بالأبيض، والتدرّج الرمادي (<span lang="en">tone</span>) لون ممزوج بالرمادي، والتعتيم (<span lang="en">shade</span>) لون ممزوج بالأسود. وبها تحصل على ألوان كثيرة مترابطة من صبغة واحدة.</p><div class="ar-check"><p><b>تحقّق من فهمك:</b> تحتاج لونًا لزرّ أزرق عند مرور المؤشر عليه، يكون الأزرق نفسه لكن أغمق قليلًا. أي خاصية واحدة من خصائص <span dir="ltr" class="ltr">HSV</span> تغيّر؟</p><p><b>الإجابة:</b> خفّض القيمة (السطوع). تبقى الصبغة والتشبّع كما هما، فيبقى واضحًا أنه الأزرق نفسه. أما في <span dir="ltr" class="ltr">RGB</span> فستحتاج إلى تغيير الأعداد الثلاثة معًا.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>RGB is how the machine stores colour, but it is hard for people to use. If you want “the same blue, but paler”, it is not obvious which of the three numbers to change. HSV describes the same colours in three terms people understand:</p>
+<ul>
+<li><b>Hue</b> (0–360°): which colour family it is, as an angle around the colour wheel. 0° is red, 120° is green, 240° is blue.</li>
+<li><b>Saturation</b> (0–100%): how pure or intense it is. 100% is the vivid colour; 0% is grey.</li>
+<li><b>Value</b> (0–100%): how bright it is. 0% is always black.</li>
+</ul>
+<p>HSV is not a different set of colours. It is another way of describing the same RGB colours, and software converts between the two instantly. A close cousin, <b>HSL</b>, uses lightness instead of value: in HSL, 100% lightness is always white, while in HSV 100% value is the brightest version of the hue.</p>
+<p>From art practice come three useful words: a <b>tint</b> is a colour mixed with white, a <b>tone</b> is mixed with grey and a <b>shade</b> is mixed with black. They are how you get many related colours from one hue.</p>
+</div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · HSV explorer</p><span class="muted">Change one property at a time and watch the RGB numbers move.</span></div>
+<div class="demo-grid">
+<div class="ctrls">
+<label class="ctrl" for="hh">Hue <input type="range" id="hh" min="0" max="359" value="220"><output id="hhv">220°</output></label>
+<label class="ctrl" for="hs">Saturation <input type="range" id="hs" min="0" max="100" value="70"><output id="hsv-s">70%</output></label>
+<label class="ctrl" for="hv">Value <input type="range" id="hv" min="0" max="100" value="80"><output id="hvv">80%</output></label>
+<div class="readout"><span id="hsv-rgb"></span><span id="hsv-hex"></span></div>
+</div>
+<div class="ctrls"><div class="swatch" id="hsv-sw" style="height:96px" aria-hidden="true"></div>
+<p class="strip-label">Tints (with white)</p><div class="strip" id="tints"></div>
+<p class="strip-label">Tones (with grey)</p><div class="strip" id="tones"></div>
+<p class="strip-label">Shades (with black)</p><div class="strip" id="shades"></div></div>
+</div></div>
+<details class="check"><summary>You need a hover colour for a blue button that is the same blue but slightly darker. Which single HSV property do you change?</summary><p>Lower the value (brightness). Hue and saturation stay the same, so it is clearly the same blue. In RGB you would have to change all three numbers together.</p></details>
+</section><section id="harmony" aria-labelledby="h-harm">
+<p class="eyebrow">05 · Colour harmony</p><h2 id="h-harm">The colour wheel and six harmony schemes</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Colour harmony<span class="kt-ar" lang="ar" dir="rtl" hidden>انسجام الألوان</span></button><button type="button" class="kt" aria-expanded="false">Complementary<span class="kt-ar" lang="ar" dir="rtl" hidden>الألوان المتكاملة</span></button><button type="button" class="kt" aria-expanded="false">Analogous<span class="kt-ar" lang="ar" dir="rtl" hidden>الألوان المتجاورة</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-harmony" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-harmony" lang="ar" dir="rtl" hidden><p>الانسجام ترتيب مريح للأجزاء. والألوان التي تفتقد الانسجام تبدو إما مملّة وإما فوضوية. ويجد المصممون التوليفات المنسجمة باستخدام الهندسة على عجلة الألوان؛ فالصبغات الموضوعة بزوايا معيّنة بعضها من بعض تميل إلى التلاؤم. وتنقسم المخططات إلى مجموعتين.</p>
+<p><b>الانسجام المتدرّج</b> (هادئ، تباين منخفض):</p>
+<ul><li><b>أحادي اللون</b> (<span lang="en">Monochromatic</span>): صبغة واحدة تتغيّر في التشبّع والقيمة فقط. وهو الأسهل في الإتقان.</li>
+<li><b>الألوان المتجاورة</b> (<span lang="en">Analogous</span>): صبغات متجاورة على العجلة، مثل الأزرق والأزرق المخضرّ والأخضر.</li></ul>
+<p><b>الانسجام التبايني</b> (حيوي، تباين مرتفع):</p>
+<ul><li><b>الألوان المتكاملة</b> (<span lang="en">Complementary</span>): صبغتان متقابلتان على العجلة (بينهما <span dir="ltr" class="ltr">180°</span>).</li>
+<li><b>المتكامل المنقسم</b> (<span lang="en">Split complementary</span>): صبغة واحدة مع الصبغتين المجاورتين لمكمّلها. تباين قوي مع توتر أقل.</li>
+<li><b>الثلاثي</b> (<span lang="en">Triadic</span>): ثلاث صبغات متساوية الأبعاد (بين كل منها <span dir="ltr" class="ltr">120°</span>). اجعل واحدة منها سائدة واستخدم الأخريين للإبراز.</li>
+<li><b>الرباعي</b> (<span lang="en">Tetradic</span>، أو المتكامل المزدوج): أربع صبغات تشكّل مستطيلًا على العجلة. وهو الأصعب في الموازنة؛ فاجعل لونًا واحدًا يقود.</li></ul><div class="ar-note key"><b>فكرة أساسية · عجلة الألوان <span dir="ltr" class="ltr">RYB</span></b><p>يعتمد انسجام الألوان في هذا المقرر على <b>عجلة الألوان التقليدية <span dir="ltr" class="ltr">RYB</span></b> (الأحمر، الأصفر، الأزرق)، وهي عجلة الفنانين في نظرية الألوان. ألوانها الأساسية الأحمر والأصفر والأزرق، والثانوية البرتقالي والأخضر والبنفسجي. والأزواج المتقابلة فيها: الأحمر والأخضر، والأصفر والبنفسجي، والأزرق والبرتقالي. أما منتقيات الألوان في البرامج (<span dir="ltr" class="ltr">HSV</span>، القسم 04) فتستخدم عجلة مختلفة مبنية على الضوء الأحمر والأخضر والأزرق، يقابل فيها الأزرقُ الأصفرَ. لذلك لا تبحث عن اللون المكمّل بإضافة <span dir="ltr" class="ltr">180°</span> إلى الصبغة في منتقي <span dir="ltr" class="ltr">HSV</span> في برنامج Krita، بل ابنِ المخطط على عجلة <span dir="ltr" class="ltr">RYB</span> في العرض التفاعلي وانسخ رموز الألوان الست عشرية التي تعطيك إياها.</p></div><div class="ar-check"><p><b>تحقّق من فهمك:</b> اختار فريقك لوحة ثلاثية واستخدم الصبغات الثلاث بالتساوي على ملصق كبير. ما المشكلة، وكيف تعالجها؟</p><p><b>الإجابة:</b> ثلاث صبغات قوية بكميات متساوية تتنافس على الانتباه، فيبدو الملصق فوضويًا. اجعل صبغة واحدة سائدة (نحو <span dir="ltr" class="ltr">60%</span>)، واستخدم الثانية للمساحات الداعمة (نحو <span dir="ltr" class="ltr">30%</span>)، واحتفظ بالثالثة للإبراز الصغير (نحو <span dir="ltr" class="ltr">10%</span>)، مع تخفيف تشبّع اللون السائد في الغالب.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>Harmony is a pleasing arrangement of parts. Colours that lack harmony look either boring or chaotic. Designers find harmonious combinations by using geometry on the colour wheel: hues placed at particular angles from each other tend to work together. The schemes fall into two groups.</p>
+<p><b>Gradual harmony</b> (calm, low contrast):</p>
+<ul><li><b>Monochromatic</b>: one hue, varied only in saturation and value. The easiest to get right.</li>
+<li><b>Analogous</b>: hues next to each other, such as blue, blue-green and green.</li></ul>
+<p><b>Contrastive harmony</b> (energetic, high contrast):</p>
+<ul><li><b>Complementary</b>: two hues opposite each other (180° apart).</li>
+<li><b>Split complementary</b>: one hue plus the two hues beside its complement. Strong contrast, less tension.</li>
+<li><b>Triadic</b>: three hues equally spaced (120° apart). Let one dominate and use the others as accents.</li>
+<li><b>Tetradic</b> (double complementary): four hues forming a rectangle on the wheel. Hardest to balance; let one colour lead.</li></ul>
+</div>
+<div class="callout key"><b class="lbl">Key idea · the RYB colour wheel</b><p>Colour harmony in this course uses the artist’s <b>RYB wheel</b> (red, yellow, blue), the traditional wheel of colour theory. Its primaries are red, yellow and blue; its secondaries are orange, green and violet. Opposite pairs are red–green, yellow–violet and blue–orange. Software colour pickers (HSV, section 04) use a different wheel based on red, green and blue light, where blue sits opposite yellow. So do not find a complement by adding 180° to the hue in Krita’s HSV picker: build the scheme on the RYB wheel below and copy the hex codes it gives you.</p></div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · harmony generator</p><span class="muted">Pick a base hue and a scheme. The preview applies 60-30-10 (see section 06).</span></div>
+<div class="demo-grid">
+<div class="wheel-wrap"><div class="wheel" aria-hidden="true"></div><div id="markers"></div></div>
+<div class="ctrls">
+<label class="ctrl" for="bh">Base hue (RYB) <input type="range" id="bh" min="0" max="359" value="240"><output id="bhv">240°</output></label>
+<label for="scheme" style="font-weight:700; color:var(--ink); font-size:15px">Scheme</label>
+<select id="scheme"><option value="mono">Monochromatic</option><option value="analog">Analogous</option><option value="comp" selected>Complementary</option><option value="split">Split complementary</option><option value="triad">Triadic</option><option value="tetrad">Tetradic</option></select>
+<p class="muted" id="scheme-note"></p>
+</div></div>
+<div class="palette" id="palette"></div>
+<div class="mock" id="mock"><div class="mock-top" id="mock-top">Campus Book Fair</div><div class="mock-body" id="mock-body"><p id="mock-text">Thursday 7 pm · Central Library. Talks, signings and 40 publishers.</p><span class="mock-btn" id="mock-btn">Register</span></div></div>
+<p class="muted" id="mock-note">Dominant colour about 60%, secondary about 30%, accent about 10%.</p>
+</div>
+<details class="check"><summary>Your team picks a triadic palette and uses all three hues equally on a large poster. What goes wrong, and how do you fix it?</summary><p>Three strong hues in equal amounts compete for attention, so the poster feels chaotic. Let one hue dominate (about 60%), use the second for supporting areas (about 30%) and keep the third for small accents (about 10%), often with lower saturation for the dominant one.</p></details>
+</section><section id="using" aria-labelledby="h-use">
+<p class="eyebrow">06 · Using colour well</p><h2 id="h-use">Proportion, meaning and contrast</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Contrast ratio<span class="kt-ar" lang="ar" dir="rtl" hidden>نسبة التباين</span></button><button type="button" class="kt" aria-expanded="false">Accessibility<span class="kt-ar" lang="ar" dir="rtl" hidden>إتاحة الوصول</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-using" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-using" lang="ar" dir="rtl" hidden><p>قد تُستخدم لوحة ألوان جيدة استخدامًا سيئًا. وثلاث عادات تصنع الفرق:</p>
+<ul><li><b>النسبة <span dir="ltr" class="ltr">(60-30-10)</span>.</b> لون سائد يغطي نحو <span dir="ltr" class="ltr">60%</span> من التصميم، ولون ثانوي نحو <span dir="ltr" class="ltr">30%</span>، ولون إبراز نحو <span dir="ltr" class="ltr">10%</span>. لون الإبراز هو ما تتجه إليه العين أولًا، فاحتفظ به للعنصر المهم، مثل الزر الرئيسي. وهذه الصفحة تتبع القاعدة: رماديات مائلة إلى الأزرق الفاتح <span dir="ltr" class="ltr">(60%)</span>، وكحلي داكن وأزرق <span dir="ltr" class="ltr">(30%)</span>، وكهرماني هادئ للإبراز فقط <span dir="ltr" class="ltr">(10%)</span>.</li>
+<li><b>الدلالة.</b> الألوان الدافئة (الأحمر والبرتقالي والأصفر) توحي بالحيوية وتبدو متقدّمة، والألوان الباردة (الأزرق والأخضر) توحي بالهدوء وتبدو متراجعة. والدلالات تختلف أيضًا باختلاف الثقافة والسياق، فاختبرها مع جمهورك الفعلي.</li>
+<li><b>التباين.</b> يجب أن يبرز النص عن خلفيته للجميع، ومنهم ضعاف البصر ومن لديهم عمى ألوان. وتقيس إرشادات إتاحة الوصول لمحتوى الويب (<span dir="ltr" class="ltr">WCAG</span>) ذلك بنسبة التباين (<span lang="en">contrast ratio</span>)، من <span dir="ltr" class="ltr">1 : 1</span> (لا تباين) إلى <span dir="ltr" class="ltr">21 : 1</span> (أسود على أبيض). يحتاج النص العادي إلى <span dir="ltr" class="ltr">4.5 : 1</span> على الأقل، ويحتاج النص الكبير (نحو <span dir="ltr" class="ltr">24 px</span>، أو <span dir="ltr" class="ltr">19 px</span> عريض) إلى <span dir="ltr" class="ltr">3 : 1</span> على الأقل.</li></ul><div class="ar-note mistake"><b>خطأ شائع</b><p>الاعتماد على اللون وحده لنقل المعنى، مثل الأحمر لـ«خطأ» والأخضر لـ«صحيح». يصيب قصور تمييز الأحمر والأخضر نحو رجل من كل <span dir="ltr" class="ltr">12</span> وامرأة من كل <span dir="ltr" class="ltr">200</span> في المجتمعات ذات الأصول الأوروبية الشمالية؛ والنسب أقل في معظم المجتمعات الأخرى، لكنها تظل كافية لتهمّ في كل قاعة دراسية. وقد لا يرى هؤلاء الفرق. أضف كلمة أو أيقونة أيضًا، كما تفعل إجابات الاختبار في هذه الصفحة.</p></div><div class="ar-check"><p><b>تحقّق من فهمك:</b> نص رمادي فاتح <span dir="ltr" class="ltr">(#8A93A3)</span> على أبيض لا يجتاز الاختبار. ما أبسط حل يحافظ على هدوء التصميم؟</p><p><b>الإجابة:</b> اجعل النص أغمق (خفّض قيمته) حتى تبلغ النسبة <span dir="ltr" class="ltr">4.5 : 1</span>، مثلًا إلى <span dir="ltr" class="ltr">#5A6679</span>. أبقِ الصبغة نفسها ليبقى التصميم منتميًا إلى اللوحة نفسها.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>A good palette can still be used badly. Three habits make the difference:</p>
+<ol>
+<li><b>Proportion (60-30-10).</b> One dominant colour covers about 60% of the design, a secondary colour about 30%, and an accent about 10%. The accent is what the eye goes to first, so save it for the thing that matters, such as the main button. This page follows the rule: light blue-greys (60%), dark ink and blue (30%), and a muted amber only on highlights (10%).</li>
+<li><b>Meaning.</b> Warm colours (reds, oranges, yellows) feel energetic and come forward; cool colours (blues, greens) feel calm and recede. Meanings also depend on culture and context, so test with your real audience.</li>
+<li><b>Contrast.</b> Text must stand out from its background, for everyone, including people with low vision or colour-blindness. The Web Content Accessibility Guidelines (WCAG) measure this as a <b>contrast ratio</b> from 1 : 1 (no contrast) to 21 : 1 (black on white). Normal text needs at least 4.5 : 1; large text (about 24 px, or 19 px bold) needs at least 3 : 1.</li>
+</ol>
+</div>
+<div class="callout mistake"><b class="lbl">Common mistake</b><p>Using colour alone to carry meaning, such as red for “wrong” and green for “right”. Red-green colour-vision deficiency affects about 1 in 12 men and 1 in 200 women in populations of Northern European ancestry; rates are lower in most other populations, but still large enough to matter in every class. Such viewers may not see the difference. Add a word or an icon as well, as the answers in this page’s quiz do.</p></div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · contrast checker</p><span class="muted">Pick text and background colours. The ratio is calculated with the WCAG formula.</span></div>
+<div class="demo-grid">
+<div class="ctrls">
+<div class="inputs"><label for="fg">Text colour<input type="color" id="fg" value="#8A93A3"></label><label for="bgc">Background<input type="color" id="bgc" value="#FFFFFF"></label></div>
+<p class="ratio" id="ratio">—</p>
+<div class="pf" id="pf"></div>
+</div>
+<div class="sample" id="sample"><p class="s2">Large heading text</p><p class="s1">Normal body text: can everyone in the room read this comfortably?</p></div>
+</div></div>
+<details class="check"><summary>Light grey text (#8A93A3) on white fails. What is the simplest fix that keeps the design calm?</summary><p>Darken the text (lower its value) until the ratio reaches 4.5 : 1, for example to #5A6679. Keep the hue the same so the design still feels like the same palette.</p></details>
+</section><section id="pixels" aria-labelledby="h-pix">
+<p class="eyebrow">07 · Pixels and bit depth</p><h2 id="h-pix">How many colours can one pixel hold?</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Pixel<span class="kt-ar" lang="ar" dir="rtl" hidden>بكسل، عنصر الصورة</span></button><button type="button" class="kt" aria-expanded="false">Bit depth<span class="kt-ar" lang="ar" dir="rtl" hidden>عمق البت</span></button><button type="button" class="kt" aria-expanded="false">Banding<span class="kt-ar" lang="ar" dir="rtl" hidden>التشريط اللوني</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-pixels" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-pixels" lang="ar" dir="rtl" hidden><p>الصورة الرقمية شبكة من البكسلات (عناصر الصورة)، وكل بكسل يخزّن لونًا واحدًا. وعدد البتات المستخدمة لهذا اللون هو عمق البت (<span lang="en">bit depth</span>)، وهو يحدّد عدد الألوان الممكنة: <span dir="ltr" class="ltr">n</span> بت تعطي <span dir="ltr" class="ltr">2<sup>n</sup></span> لونًا.</p>
+<table class="ar-table"><thead><tr><th>بت لكل بكسل</th><th>عدد الألوان الممكنة</th><th>الاستخدام المعتاد</th></tr></thead><tbody>
+<tr><td><span dir="ltr" class="ltr">1</span></td><td><span dir="ltr" class="ltr">2</span></td><td>رسوم خطية بالأبيض والأسود، الفاكس</td></tr>
+<tr><td><span dir="ltr" class="ltr">8</span></td><td><span dir="ltr" class="ltr">256</span></td><td>تدرّج رمادي، أو <span dir="ltr" class="ltr">GIF</span> بلوحة ألوان</td></tr>
+<tr><td><span dir="ltr" class="ltr">24</span> (8 لكل قناة)</td><td><span dir="ltr" class="ltr">16,777,216</span></td><td>الصور والشاشات القياسية («الألوان الحقيقية»)</td></tr>
+<tr><td><span dir="ltr" class="ltr">32</span> (24 + 8 للشفافية)</td><td><span dir="ltr" class="ltr">16,777,216</span> مع الشفافية</td><td><span dir="ltr" class="ltr">PNG</span> بخلفية شفافة، خامات الألعاب</td></tr>
+<tr><td><span dir="ltr" class="ltr">30</span> أو <span dir="ltr" class="ltr">48</span> (10 أو 16 لكل قناة)</td><td>أكثر من مليار</td><td>فيديو <span dir="ltr" class="ltr">HDR</span>، وتحرير الصور الاحترافي</td></tr></tbody></table>
+<p>قلّة المستويات في كل قناة تظهر على شكل تشريط لوني (<span lang="en">banding</span>): تتحوّل التدرّجات الناعمة، مثل السماء، إلى أشرطة ظاهرة. جرّب ذلك في العرض التفاعلي بتقليل البتات لكل قناة.</p><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>A digital image is a grid of <b>pixels</b> (picture elements). Each pixel stores one colour. The number of bits used for that colour is the <b>bit depth</b>, and it decides how many different colours are possible: <i>n</i> bits give 2<sup><i>n</i></sup> colours.</p>
+</div>
+<div class="table-wrap"><table><thead><tr><th>Bits per pixel</th><th>Possible colours</th><th>Typical use</th></tr></thead><tbody>
+<tr><td>1</td><td>2</td><td>Black-and-white line art, fax</td></tr>
+<tr><td>8</td><td>256</td><td>Greyscale, or GIF with a palette</td></tr>
+<tr><td>24 (8 per channel)</td><td>16,777,216</td><td>Standard photos and screens (“true colour”)</td></tr>
+<tr><td>32 (24 + 8 alpha)</td><td>16,777,216 + transparency</td><td>PNG with transparency, game textures</td></tr>
+<tr><td>30 or 48 (10 or 16 per channel)</td><td>Over a billion</td><td>HDR video, professional photo editing</td></tr></tbody></table></div>
+<div class="prose"><p>Too few levels per channel show up as <b>banding</b>: smooth gradients such as a sky turn into visible stripes. Try it below by lowering the bits per channel.</p></div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · bit depth and banding</p><span class="muted">Fewer bits means fewer levels, and the gradient breaks into bands.</span></div>
+<label class="ctrl" for="bits" style="grid-template-columns:150px 1fr 56px">Bits per channel <input type="range" id="bits" min="1" max="8" value="8"><output id="bitsv">8</output></label>
+<canvas id="band" class="demo-canvas" width="900" height="140" aria-label="A sunset gradient shown at the chosen bit depth"></canvas>
+<div class="readout"><span id="levels"></span><span id="colours"></span></div>
+</div>
+</section><section id="size" aria-labelledby="h-size">
+<p class="eyebrow">08 · File size</p><h2 id="h-size">How big is an image file?</h2><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-size" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-size" lang="ar" dir="rtl" hidden><p>الصورة غير المضغوطة تخزّن كل بكسل، لذلك يأتي حجمها مباشرة من ثلاثة أعداد:</p><p class="calc" dir="ltr">size in bytes = width × height × bits per pixel ÷ 8</p><p>أي: الحجم بالبايت = العرض × الارتفاع × البتات لكل بكسل ÷ 8. والقسمة على <span dir="ltr" class="ltr">8</span> تحوّل البتات إلى بايتات. ثم تضغط صيغ مثل <span dir="ltr" class="ltr">PNG</span> و<span dir="ltr" class="ltr">JPEG</span> هذا الحجم، وهو موضوع الأسبوع الرابع، لكن الحجم غير المضغوط هو ما تشغله الصورة في الذاكرة أثناء استخدامها في برنامج أو لعبة.</p><div class="ar-worked"><h4>مثال محلول · لقطة شاشة بدقة <span dir="ltr" class="ltr">Full HD</span></h4><ol><li>الدقة <span dir="ltr" class="ltr">1920 × 1080 = 2,073,600</span> بكسل.</li><li>ألوان حقيقية: <span dir="ltr" class="ltr">24</span> بتًا لكل بكسل. <span dir="ltr" class="ltr">2,073,600 × 24 = 49,766,400</span> بت.</li><li><span dir="ltr" class="ltr">÷ 8 = 6,220,800</span> بايت.</li><li>أي نحو <span dir="ltr" class="ltr">6.2 MB</span> (بالقسمة على <span dir="ltr" class="ltr">1,000,000</span>)، أو نحو <span dir="ltr" class="ltr">5.93 MiB</span> (بالقسمة على <span dir="ltr" class="ltr">1,048,576</span>، كما تفعل كثير من أنظمة التشغيل).</li></ol></div><div class="ar-check"><p><b>تحقّق من فهمك:</b> خامة <span dir="ltr" class="ltr">4K</span> <span dir="ltr" class="ltr">(3840 × 2160)</span> مع الشفافية (<span dir="ltr" class="ltr">32</span> بتًا لكل بكسل): كم تشغل من الذاكرة تقريبًا؟</p><p><b>الإجابة:</b> <span dir="ltr" class="ltr">3840 × 2160 × 32 ÷ 8 = 33,177,600</span> بايت، أي نحو <span dir="ltr" class="ltr">33 MB</span>. ولهذا تضغط الألعاب الخامات، وتستخدم خامات أصغر حيث لا يلاحظ اللاعب.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>An uncompressed image stores every pixel, so its size follows directly from three numbers:</p>
+<p class="calc">size in bytes = width × height × bits per pixel ÷ 8</p>
+<p>Dividing by 8 converts bits to bytes. Formats such as PNG and JPEG then compress this, which is the topic of week 4, but the uncompressed size is what the image occupies in memory while a program or game uses it.</p>
+</div>
+<div class="worked"><h3>Worked example · a Full HD screenshot</h3><ol>
+<li>Resolution 1920 × 1080 = 2,073,600 pixels.</li>
+<li>True colour: 24 bits per pixel. 2,073,600 × 24 = 49,766,400 bits.</li>
+<li>÷ 8 = 6,220,800 bytes.</li>
+<li>≈ 6.2 MB (dividing by 1,000,000), or ≈ 5.93 MiB (dividing by 1,048,576, as many operating systems do).</li>
+</ol></div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · size calculator</p><span class="muted">Change the numbers and check your own working.</span></div>
+<div class="inputs">
+<label for="sw">Width (px)<input type="number" id="sw" value="1920" min="1"></label>
+<label for="shh">Height (px)<input type="number" id="shh" value="1080" min="1"></label>
+<label for="sbpp">Bits per pixel<select id="sbpp"><option value="1">1</option><option value="8">8</option><option value="24" selected>24</option><option value="32">32</option><option value="48">48</option></select></label>
+</div>
+<div class="out-grid"><div><small>Pixels</small><span class="big-num" id="o-px"></span></div><div><small>Bytes</small><span class="big-num" id="o-b"></span></div><div><small>Megabytes</small><span class="big-num" id="o-mb"></span></div></div>
+<p class="muted" id="o-steps"></p>
+</div>
+<details class="check"><summary>A 4K texture (3840 × 2160) with transparency (32 bits per pixel): about how much memory does it take?</summary><p>3840 × 2160 × 32 ÷ 8 = 33,177,600 bytes, about 33 MB. That is why games compress textures and use smaller ones where players will not notice.</p></details>
+</section><section id="resolution" aria-labelledby="h-res">
+<p class="eyebrow">09 · Resolution</p><h2 id="h-res">Resolution, PPI and printing</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Resolution<span class="kt-ar" lang="ar" dir="rtl" hidden>الدقة</span></button><button type="button" class="kt" aria-expanded="false">Pixels per inch (PPI)<span class="kt-ar" lang="ar" dir="rtl" hidden>بكسل لكل بوصة</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-resolution" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-resolution" lang="ar" dir="rtl" hidden><p>الدقة (<span lang="en">resolution</span>) هي عدد البكسلات في الصورة، وتُكتب العرض × الارتفاع، مثل <span dir="ltr" class="ltr">1920 × 1080</span>. وهي لا تقول شيئًا عن الحجم الفعلي حتى تقرّر مدى كثافة عرض هذه البكسلات أو طباعتها.</p>
+<p>وهذه الكثافة هي <span dir="ltr" class="ltr">PPI</span> (بكسل لكل بوصة). فالصورة نفسها بعرض <span dir="ltr" class="ltr">3000</span> بكسل يبلغ عرضها <span dir="ltr" class="ltr">10</span> بوصات عند <span dir="ltr" class="ltr">300 PPI</span>، ونحو <span dir="ltr" class="ltr">42</span> بوصة عند <span dir="ltr" class="ltr">72 PPI</span>. أما <span dir="ltr" class="ltr">DPI</span> (نقطة لكل بوصة) فتصف بدقة نقاط حبر الطابعة، لكن الناس كثيرًا ما يستخدمونها بمعنى <span dir="ltr" class="ltr">PPI</span>.</p>
+<p>في الطباعة، الهدف المعتاد <span dir="ltr" class="ltr">300 PPI</span> لما يُنظر إليه عن قرب (المطويات والكتب)، وأقل من ذلك للملصقات الكبيرة التي تُرى من بعيد. أما في الشاشات فالـ<span dir="ltr" class="ltr">PPI</span> ثابت تحدّده الشاشة، فلا يهمّ إلا أبعاد الصورة بالبكسل.</p><div class="ar-worked"><h4>مثال محلول · ملصق <span dir="ltr" class="ltr">A4</span> بدقة <span dir="ltr" class="ltr">300 PPI</span></h4><ol><li>مقاس <span dir="ltr" class="ltr">A4</span> هو <span dir="ltr" class="ltr">21.0 × 29.7 cm</span>، والبوصة <span dir="ltr" class="ltr">2.54 cm</span>.</li><li>العرض: <span dir="ltr" class="ltr">21.0 ÷ 2.54 = 8.27 in × 300 = 2480</span> بكسل.</li><li>الارتفاع: <span dir="ltr" class="ltr">29.7 ÷ 2.54 = 11.69 in × 300 = 3508</span> بكسل.</li><li>إذن أنشئ مستندك بمقاس <span dir="ltr" class="ltr">2480 × 3508</span> بكسل.</li></ol></div><div class="ar-note mistake"><b>خطأ شائع</b><p>تغيير قيمة <span dir="ltr" class="ltr">PPI</span> في برنامج التحرير وتوقّع صورة أوضح. إذا بقي عدد البكسلات كما هو فلن يصبح شيء أوضح؛ أنت تغيّر حجم الطباعة فقط. وتكبير صورة صغيرة يضيف بكسلات مُختلَقة ويجعلها ضبابية.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p><b>Resolution</b> is the number of pixels in an image, written width × height, such as 1920 × 1080. It says nothing about physical size until you decide how densely to display or print those pixels.</p>
+<p><b>PPI</b> (pixels per inch) is that density. The same 3000-pixel-wide photo is 10 inches wide at 300 PPI but about 42 inches wide at 72 PPI. <b>DPI</b> (dots per inch) strictly describes printer ink dots, but people often use it to mean PPI.</p>
+<p>For print, the common target is 300 PPI for close viewing (flyers, books) and lower for large posters viewed from a distance. For screens, PPI is fixed by the display, so only the pixel dimensions matter.</p>
+</div>
+<div class="worked"><h3>Worked example · an A4 poster at 300 PPI</h3><ol>
+<li>A4 is 21.0 × 29.7 cm. One inch is 2.54 cm.</li>
+<li>Width: 21.0 ÷ 2.54 = 8.27 in × 300 = 2480 pixels.</li>
+<li>Height: 29.7 ÷ 2.54 = 11.69 in × 300 = 3508 pixels.</li>
+<li>So set up your document at 2480 × 3508 pixels.</li>
+</ol></div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · print size calculator</p></div>
+<div class="inputs">
+<label for="pw">Width (cm)<input type="number" id="pw" value="21" step="0.1" min="0.1"></label>
+<label for="ph">Height (cm)<input type="number" id="ph" value="29.7" step="0.1" min="0.1"></label>
+<label for="pp">PPI<select id="pp"><option>72</option><option>150</option><option selected>300</option></select></label>
+</div>
+<div class="out-grid"><div><small>Width</small><span class="big-num" id="p-w"></span></div><div><small>Height</small><span class="big-num" id="p-h"></span></div><div><small>Megapixels</small><span class="big-num" id="p-mp"></span></div></div>
+</div>
+<div class="callout mistake"><b class="lbl">Common mistake</b><p>Changing the PPI number in an editor and expecting a sharper image. If the pixel count stays the same, nothing gets sharper; you only change the printed size. Enlarging a small image adds invented pixels and makes it blurry.</p></div>
+</section><section id="aliasing" aria-labelledby="h-alias">
+<p class="eyebrow">10 · Sampling and aliasing</p><h2 id="h-alias">Why edges look jagged, and how to smooth them</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Sampling<span class="kt-ar" lang="ar" dir="rtl" hidden>أخذ العيّنات</span></button><button type="button" class="kt" aria-expanded="false">Aliasing<span class="kt-ar" lang="ar" dir="rtl" hidden>التسنّن، تعرّج الحواف</span></button><button type="button" class="kt" aria-expanded="false">Anti-aliasing<span class="kt-ar" lang="ar" dir="rtl" hidden>تنعيم الحواف</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-aliasing" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-aliasing" lang="ar" dir="rtl" hidden><p>الشكل مثل الدائرة ناعم ومتصل، أما شبكة البكسلات فليست كذلك. ولرسم الدائرة يأخذ الحاسب عيّنات منها (<span lang="en">sampling</span>): يسأل عن كل بكسل «هل هذا البكسل داخل الشكل؟» فيلوّنه أو يتركه.</p>
+<p>مع عيّنة واحدة لكل بكسل يكون كل بكسل إما داخل الشكل تمامًا وإما خارجه تمامًا، فتتحوّل الحواف المنحنية والمائلة إلى درجات سلّم. هذا هو التسنّن (<span lang="en">aliasing</span>)، ويُسمّى أحيانًا «الحواف المسنّنة» (<span lang="en">jaggies</span>). ويزداد سوءًا كلما كانت الشبكة أخشن.</p>
+<p>أما تنعيم الحواف (<span lang="en">anti-aliasing</span>) فيأخذ عدة عيّنات داخل كل بكسل، ويلوّنه بحسب نسبة العيّنات التي تقع داخل الشكل. فتصبح بكسلات الحافة بدرجات وسيطة، وتقرأ عينك الحافة ناعمة. وتفعل الألعاب وبرامج التصيير ثلاثي الأبعاد الشيء نفسه بتقنيات مثل <span dir="ltr" class="ltr">MSAA</span>، التي ستتعرّف عليها في الأسبوع الثاني عشر.</p><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>A shape such as a circle is smooth and continuous, but the pixel grid is not. To draw the circle, the computer <b>samples</b> it: for each pixel it asks “is this pixel inside the shape?” and colours it in or not.</p>
+<p>With one sample per pixel, every pixel is either fully in or fully out, so curved and slanted edges become staircases. This is <b>aliasing</b>, often called “jaggies”. It gets worse as the grid gets coarser.</p>
+<p><b>Anti-aliasing</b> takes several samples inside each pixel and colours the pixel by the fraction that falls inside the shape. Edge pixels become in-between shades, and your eye reads the edge as smooth. Games and 3D renderers do the same with techniques such as MSAA, which you will meet in week 12.</p>
+</div>
+<div class="demo">
+<div class="demo-h"><p class="eyebrow">Try it · see the pixels</p><span class="muted">Coarse grid, one sample per pixel: jagged. Turn on anti-aliasing to compare.</span></div>
+<div class="demo-grid">
+<canvas id="alias" class="demo-canvas" width="480" height="480" aria-label="A circle and a slanted line drawn on a pixel grid"></canvas>
+<div class="ctrls">
+<label class="ctrl" for="grid" style="grid-template-columns:110px 1fr 56px">Grid size <input type="range" id="grid" min="8" max="64" value="16"><output id="gridv">16</output></label>
+<div class="seg" role="group" aria-label="Sampling mode"><button type="button" data-aa="0" aria-pressed="true">1 sample</button><button type="button" data-aa="1" aria-pressed="false">Anti-aliased (16 samples)</button></div>
+<label style="display:flex; gap:8px; align-items:center; font-weight:600; color:var(--ink); font-size:15px"><input type="checkbox" id="outline" checked> Show the true shape</label>
+<p class="muted">At grid size 64 the jaggies almost disappear: more pixels means each step is smaller. That is why high-resolution screens look smoother.</p>
+</div></div></div>
+</section><section id="gamut" aria-labelledby="h-gamut">
+<p class="eyebrow">11 · Colour spaces</p><h2 id="h-gamut">Colour spaces and gamut</h2>
+<div class="kts"><span class="kts-label">Key terms · tap for Arabic</span><button type="button" class="kt" aria-expanded="false">Colour space<span class="kt-ar" lang="ar" dir="rtl" hidden>فضاء الألوان</span></button><button type="button" class="kt" aria-expanded="false">Gamut<span class="kt-ar" lang="ar" dir="rtl" hidden>نطاق الألوان</span></button></div><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-gamut" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-gamut" lang="ar" dir="rtl" hidden><p>الأعداد <span dir="ltr" class="ltr">rgb(255, 0, 0)</span> تعني «أحمر كامل»، لكن ما مدى احمرار الأحمر الكامل؟ هذا يعتمد على الجهاز. فضاء الألوان (<span lang="en">colour space</span>) يربط الأعداد بألوان حقيقية قابلة للقياس، ونطاق الألوان (<span lang="en">gamut</span>) هو مدى الألوان الذي يستطيع تمثيله.</p>
+<ul><li><b><span dir="ltr" class="ltr">sRGB</span></b> هو المعيار للويب ولمعظم الشاشات. وإذا لم تكن تعرف أين ستُعرض الصورة، فاستخدم <span dir="ltr" class="ltr">sRGB</span>.</li>
+<li><b><span dir="ltr" class="ltr">Display P3</span></b> نطاق أوسع تستخدمه كثير من الهواتف والحواسيب المحمولة الحديثة؛ فقد تكون ألوانه الحمراء والخضراء أكثر حيوية.</li>
+<li><b>نطاقات الطباعة <span dir="ltr" class="ltr">CMYK</span></b> أصغر من <span dir="ltr" class="ltr">sRGB</span> في مناطق كثيرة، ولهذا قد تبدو ألوان الشاشة الزاهية أبهت في الطباعة.</li></ul>
+<p>عمليًا: اعمل بـ<span dir="ltr" class="ltr">sRGB</span> في مشاريع الشاشة، وضمِّن ملف تعريف الألوان عند التصدير، وعاين العمل بـ<span dir="ltr" class="ltr">CMYK</span> قبل إرسال أي شيء إلى الطباعة.</p><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="prose">
+<p>The numbers <code>rgb(255, 0, 0)</code> mean “full red”, but how red is full red? It depends on the device. A <b>colour space</b> pins the numbers to real, measurable colours, and its <b>gamut</b> is the range of colours it can represent.</p>
+<ul>
+<li><b>sRGB</b> is the standard for the web and most screens. If you do not know where an image will be shown, use sRGB.</li>
+<li><b>Display P3</b> is a wider gamut used by many recent phones and laptops: its reds and greens can be more vivid.</li>
+<li><b>CMYK</b> print gamuts are smaller than sRGB in many areas, which is why vivid screen colours can look duller in print.</li>
+</ul>
+<p>In practice: work in sRGB for screen projects, embed the colour profile when you export, and preview in CMYK before sending anything to print.</p>
+</div>
+</section><section id="summary" aria-labelledby="h-sum">
+<p class="eyebrow">Summary</p><h2 id="h-sum">What to remember</h2><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-summary" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-summary" lang="ar" dir="rtl" hidden><h4>الأسبوع الثالث في ثماني نقاط</h4><ol>
+<li><b>الشاشات تضيف الضوء</b> (<span dir="ltr" class="ltr">RGB</span>، تبدأ من الأسود). <b>الطباعة تطرح الضوء</b> (<span dir="ltr" class="ltr">CMYK</span>، تبدأ من الأبيض).</li>
+<li>القناة ذات الثماني بتات فيها <span dir="ltr" class="ltr">256</span> مستوى؛ والألوان بعمق <span dir="ltr" class="ltr">24</span> بتًا فيها <span dir="ltr" class="ltr">16.7</span> مليون لون.</li>
+<li>الرمز الست عشري <span dir="ltr" class="ltr">#RRGGBB</span> وأعداد <span dir="ltr" class="ltr">OpenGL</span> العشرية (القيمة ÷ <span dir="ltr" class="ltr">255</span>) هي الألوان نفسها مكتوبة بطرق مختلفة.</li>
+<li>نموذج <span dir="ltr" class="ltr">HSV</span> (الصبغة، التشبّع، القيمة) أسهل من <span dir="ltr" class="ltr">RGB</span> في قرارات التصميم.</li>
+<li>ستة مخططات للانسجام: أحادي اللون، المتجاورة، المتكاملة، المتكامل المنقسم، الثلاثي، الرباعي.</li>
+<li>طبّق قاعدة <span dir="ltr" class="ltr">60-30-10</span>، وتحقّق أن تباين النص لا يقل عن <span dir="ltr" class="ltr">4.5 : 1</span>.</li>
+<li>حجم الملف = العرض × الارتفاع × البتات لكل بكسل ÷ <span dir="ltr" class="ltr">8</span>. بكسلات الطباعة = البوصات × <span dir="ltr" class="ltr">PPI</span>.</li>
+<li>الحواف المسنّنة تسنّن؛ وتنعيم الحواف يأخذ عدة عيّنات لكل بكسل ليجعلها ناعمة.</li></ol><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div>
+<div class="summary"><h3>Week 3 in eight points</h3><ol>
+<li><b>Screens add light</b> (RGB, start from black). <b>Print subtracts light</b> (CMYK, start from white).</li>
+<li>One 8-bit channel has <b>256 levels</b>; 24-bit colour has <b>16.7 million</b> colours.</li>
+<li>Hex <code>#RRGGBB</code> and OpenGL floats (value ÷ 255) are the same colours written differently.</li>
+<li><b>HSV</b> (hue, saturation, value) is easier for design decisions than RGB.</li>
+<li>Six harmony schemes: monochromatic, analogous, complementary, split complementary, triadic, tetradic.</li>
+<li>Apply <b>60-30-10</b> and check text contrast is at least <b>4.5 : 1</b>.</li>
+<li>File size = width × height × bits per pixel ÷ 8. Print pixels = inches × PPI.</li>
+<li>Jagged edges are <b>aliasing</b>; <b>anti-aliasing</b> samples several points per pixel to smooth them.</li>
+</ol></div>
+</section><div class="next-tab"><a class="btn" href="#practise">Next: practise what you learned →</a></div></div><div class="tabpanel" id="panel-practise" data-tab="practise" role="tabpanel" aria-label="Practise"><section id="mistakes" aria-labelledby="h-mis">
+<p class="eyebrow">Before the quiz</p><h2 id="h-mis">Common mistakes to avoid</h2>
+<div class="table-wrap"><table><thead><tr><th>Mistake</th><th>Why it is wrong</th><th>Do this instead</th></tr></thead><tbody>
+<tr><td>Picking colours one by one “because they look nice”</td><td>Colours chosen in isolation rarely work together</td><td>Start from one base hue and a named harmony scheme</td></tr>
+<tr><td>Using all palette colours equally</td><td>Nothing stands out, so the eye has nowhere to go</td><td>Apply 60-30-10; keep the accent for what matters</td></tr>
+<tr><td>Grey text on white “to look elegant”</td><td>Often below 4.5 : 1, hard to read</td><td>Check the ratio; darken the text, keep the hue</td></tr>
+<tr><td>Raising PPI to sharpen an image</td><td>Pixel count is unchanged</td><td>Start with enough pixels for the print size</td></tr>
+<tr><td>Saving gradients at low bit depth</td><td>Causes banding</td><td>Keep 8 bits per channel or more for gradients</td></tr>
+<tr><td>Finding a complement by adding 180° to the hue in a software HSV picker</td><td>Software pickers use the RGB light wheel, which places hues differently from the RYB wheel</td><td>Build the scheme on the RYB wheel and copy its hex codes</td></tr></tbody></table></div>
+</section><section id="check" aria-labelledby="h-check">
+<p class="eyebrow">Check yourself</p><h2 id="h-check">Six questions, marked on the page</h2>
+<form id="quiz" class="quiz"></form>
+<div class="actions"><button type="button" class="btn" id="q-check">Check answers</button><button type="button" class="btn ghost" id="q-reset">Start again</button><span id="q-score" style="font-weight:700; color:var(--ink)" aria-live="polite"></span></div>
+</section><div class="next-tab"><a class="btn" href="#lab">Next: the lab →</a></div></div><div class="tabpanel" id="panel-lab" data-tab="lab" role="tabpanel" aria-label="Lab"><section id="lab" aria-labelledby="h-lab"><p class="eyebrow">Lab 3</p><h2 id="h-lab">Palette, contrast and resolution</h2><button type="button" class="ar-btn" aria-expanded="false" aria-controls="ar-lab" lang="ar">اقرأ هذا القسم بالعربية</button><div class="ar-panel" id="ar-lab" lang="ar" dir="rtl" hidden><p>يحوّل هذا اللاب أفكار الأسبوع إلى بداية ملصق مشروعك 1: لوحة ألوان منسجمة، ومسودة ملصق بقاعدة <span dir="ltr" class="ltr">60-30-10</span>، وفحص التباين، ومقارنة أحجام الملفات.</p><table class="ar-table"><tbody><tr><td>ما تحتاجه</td><td>Krita، وفكرة فعالية مشروعك 1، وهذه الصفحة مفتوحة لاستخدام مولّد الألوان وفاحص التباين والحاسبات.</td></tr><tr><td>ما ستسلّمه</td><td>رابط مستودعك، وفيه لوحة الألوان والمسودة والصادرات وملاحظات <span dir="ltr" class="ltr">README</span>.</td></tr><tr><td>التقييم</td><td>جدول التقييم في نهاية القسم (<span dir="ltr" class="ltr">10</span> درجات، <span dir="ltr" class="ltr">CLO 2.1</span>).</td></tr></tbody></table><h4>أجزاء اللاب</h4><div class="ar-worked"><h4>الجزء <span dir="ltr" class="ltr">A</span> · ابنِ لوحة ألوان منسجمة <span style="font-weight:500; color:var(--muted)">(<span dir="ltr" class="ltr">20</span> دقيقة)</span></h4><p>اختر صبغة أساسية تناسب فعاليتك ومخططًا من مولّد الانسجام في القسم 05 (على عجلة <span dir="ltr" class="ltr">RYB</span>، واكتب جملة تبرّر اختيارك، ثم ارسم مربعات الألوان الخمسة في Krita وسجّل رموزها الست عشرية وأدوارها.</p><p><b>نقطة التحقق:</b> صورة لوحة الألوان وخمسة رموز مع أدوارها في <span dir="ltr" class="ltr">README</span>.</p></div><div class="ar-worked"><h4>الجزء <span dir="ltr" class="ltr">B</span> · صمّم مسودة ملصق بقاعدة <span dir="ltr" class="ltr">60-30-10</span> <span style="font-weight:500; color:var(--muted)">(<span dir="ltr" class="ltr">30</span> دقيقة)</span></h4><p>أنشئ مستندًا بمقاس <span dir="ltr" class="ltr">A4</span> عند <span dir="ltr" class="ltr">300 PPI</span> <span dir="ltr" class="ltr">(2480 × 3508)</span>، واجعل اللون السائد نحو <span dir="ltr" class="ltr">60%</span> والثانوي <span dir="ltr" class="ltr">30%</span> ولون الإبراز للعنصر الأهم فقط، وأضف العنوان والتاريخ والمكان.</p><p><b>نقطة التحقق:</b> اسأل زميلك ماذا يلاحظ أولًا؛ إن لم يكن عنصر الإبراز فعدّل النِّسب.</p></div><div class="ar-worked"><h4>الجزء <span dir="ltr" class="ltr">C</span> · افحص تباين كل نص <span style="font-weight:500; color:var(--muted)">(<span dir="ltr" class="ltr">15</span> دقيقة)</span></h4><p>اقرأ لون كل نص وخلفيته وأدخلهما في فاحص التباين في القسم 06، وعدّل القيمة (لا الصبغة) حتى تنجح كل الأزواج، وسجّل النسب قبل التعديل وبعده.</p><p><b>نقطة التحقق:</b> كل أزواج النصوص ناجحة، والنسب قبل وبعد مسجّلة.</p></div><div class="ar-worked"><h4>الجزء <span dir="ltr" class="ltr">D</span> · صدّر وقارن أحجام الملفات <span style="font-weight:500; color:var(--muted)">(<span dir="ltr" class="ltr">20</span> دقيقة)</span></h4><p>صدّر الملصق بثلاث طرق <span dir="ltr" class="ltr">(300 PPI, 72 PPI, indexed PNG)</span>، وسجّل أحجامها، واحسب الحجم غير المضغوط، واشرح في جملتين لماذا الملفات المحفوظة أصغر.</p><p><b>نقطة التحقق:</b> ثلاث صادرات وأحجامها وحسابك وشرح قصير.</p></div><div class="ar-worked"><h4>الجزء <span dir="ltr" class="ltr">E</span> · احفظ وسلّم <span style="font-weight:500; color:var(--muted)">(<span dir="ltr" class="ltr">5</span> دقيقة)</span></h4><p>احفظ التغييرات وارفعها، وسلّم الرابط في تكليف اللاب 3.</p></div><div class="ar-note key"><b>كيف تستخدم هذا الشرح</b><p>اقرأ هدف كل جزء هنا بالعربية، ثم نفّذ الخطوات المرقّمة بالإنجليزية كما هي، لأن أسماء القوائم والأزرار في البرامج بالإنجليزية. إذا تعثّرت فابقَ في وقت الدعم (آخر <span dir="ltr" class="ltr">30</span> دقيقة) ليساعدك المحاضر.</p></div><p class="ar-foot">ترجمة عربية مساندة للشرح. المرجع هو النص الإنجليزي، وهو لغة الاختبارات والبرامج.</p></div><div class="prose"><p>This lab turns the week’s ideas into the start of your Project 1 poster. Work through the parts in order; each step says where to click and what you should see.</p></div><div class="lab-bar" aria-hidden="true"><span style="flex:20">A · 20</span><span class="alt" style="flex:30">B · 30</span><span style="flex:15">C · 15</span><span class="alt" style="flex:20">D · 20</span><span style="flex:5">E</span><span class="support" style="flex:30">Support · 30</span></div><div class="prep"><div><b>You need</b>Krita, your Project 1 event idea, and this page open for the generator, checker and calculators.</div><div><b>You will submit</b>Your repository link, with the palette, draft, exports and README notes.</div><div><b>Graded on</b>The rubric at the end of this section (10 points, CLO 2.1).</div></div><p class="muted">Menu names are for Krita 5. If yours differ, ask the TA.</p><div class="part"><div class="part-h"><h3>Part A · Build a harmonious palette</h3><span class="mins">20 min</span></div><ol class="stepsx"><li data-n="A1"><div><span>Open the harmony generator in section 05 of this page. Choose a base hue that suits your Project 1 event, then pick a scheme.</span><span class="expect">five colours on the wheel and in the poster preview.</span></div></li><li data-n="A2"><div><span>Write one sentence explaining why the scheme fits your event (calm, energetic, formal…).</span></div></li><li data-n="A3"><div><span>In Krita, create a small new document: <span class="menu">File › New</span>, any size. Draw five squares and fill each with one palette colour: click the foreground colour, type the hex code into the hex field, then use the fill tool.</span><span class="expect">five coloured squares.</span></div></li><li data-n="A4"><div><span>Export it as <span class="menu">process/palette.png</span>. In your repository README, list the five hex codes with their role: dominant, secondary or accent.</span></div></li></ol><p class="checkpoint"><b>Checkpoint.</b> A palette image and five hex codes with roles in your README.</p></div><div class="part"><div class="part-h"><h3>Part B · Lay out a poster draft with 60-30-10</h3><span class="mins">30 min</span></div><ol class="stepsx"><li data-n="B1"><div><span>In Krita choose <span class="menu">File › New › Custom Document</span>. Set width 2480 px, height 3508 px and resolution 300 PPI. This is A4 at print quality (see section 09).</span><span class="expect">a tall white canvas.</span></div></li><li data-n="B2"><div><span>Fill the large background areas with your dominant colour (about 60% of the poster).</span></div></li><li data-n="B3"><div><span>Use the secondary colour for supporting blocks such as a band or a panel (about 30%).</span></div></li><li data-n="B4"><div><span>Use the accent colour only on the one thing that must stand out, such as the date or a call to action (about 10%).</span></div></li><li data-n="B5"><div><span>Add the event title, date, place and one short line of text. Save as <span class="menu">assets/work/poster-draft.kra</span>.</span><span class="expect">a poster where your eye goes to the accent first.</span></div></li></ol><p class="checkpoint"><b>Checkpoint.</b> Ask the person next to you what they notice first. If it is not your accent element, adjust the proportions.</p></div><div class="part"><div class="part-h"><h3>Part C · Check every text contrast</h3><span class="mins">15 min</span></div><ol class="stepsx"><li data-n="C1"><div><span>For each text-and-background pair, read both colours’ hex codes with Krita’s colour picker.</span></div></li><li data-n="C2"><div><span>Enter each pair in the contrast checker in section 06.</span><span class="expect">a ratio and pass or fail labels.</span></div></li><li data-n="C3"><div><span>If normal text is below 4.5 : 1, or large text below 3 : 1, darken or lighten the text (change its value, keep the hue) until it passes.</span></div></li><li data-n="C4"><div><span>Record every pair in your README: the colours, the ratio before and the ratio after.</span></div></li></ol><p class="checkpoint"><b>Checkpoint.</b> Every text pair passes, and the before and after ratios are recorded.</p></div><div class="part"><div class="part-h"><h3>Part D · Export and compare file sizes</h3><span class="mins">20 min</span></div><ol class="stepsx"><li data-n="D1"><div><span>Export the poster with <span class="menu">File › Export</span> as <span class="menu">assets/exports/poster-300ppi.png</span>.</span></div></li><li data-n="D2"><div><span>Use <span class="menu">Image › Scale Image To New Size</span>, set the resolution to 72 PPI while keeping the print size, export as <span class="menu">poster-72ppi.png</span>, then undo the scaling.</span><span class="expect">the pixel dimensions drop to about 595 × 842.</span></div></li><li data-n="D3"><div><span>Export again as PNG and tick <span class="menu">Save as indexed PNG, if possible</span> (256 colours), as <span class="menu">poster-indexed.png</span>.</span><span class="expect">possible banding in any gradients.</span></div></li><li data-n="D4"><div><span>Write down each file’s size from its file properties. Use the calculator in section 08 to work out the uncompressed size of the 300 PPI version.</span></div></li><li data-n="D5"><div><span>In two sentences, explain why the saved PNG files are smaller than your calculation. Hint: compression, the topic of week 4.</span></div></li></ol><p class="checkpoint"><b>Checkpoint.</b> Three exports, their file sizes, your calculation and a short explanation in your README.</p></div><div class="part"><div class="part-h"><h3>Part E · Commit and submit</h3><span class="mins">5 min</span></div><ol class="stepsx"><li data-n="E1"><div><span>Commit with the summary <span class="menu">Lab 3: palette, poster draft, contrast, exports</span> and push.</span></div></li><li data-n="E2"><div><span>Submit the repository link in the Lab 3 assignment on Blackboard.</span></div></li></ol></div><p class="support-note"><b>Minutes 90–120 are support time.</b> If you are not finished, stay: the instructor works with you one-to-one until you submit. If you are finished, check a classmate’s work against the rubric below, then you may leave.</p><div class="checklist" role="group" aria-label="Before you submit"><h3 style="font-size:18px">Before you submit</h3><label><input type="checkbox"> <span>My palette has five hex codes, a named scheme and a role for each colour.</span></label><label><input type="checkbox"> <span>My poster draft is 2480 × 3508 px at 300 PPI.</span></label><label><input type="checkbox"> <span>The accent colour appears only on the element that must stand out.</span></label><label><input type="checkbox"> <span>Every text pair passes the contrast check, with ratios recorded.</span></label><label><input type="checkbox"> <span>Three exports and their file sizes are in my README with my calculation.</span></label><label><input type="checkbox"> <span>I pushed my last commit and submitted the link on Blackboard.</span></label><p class="muted">The ticks stay on this page only; they are for you.</p></div><h3 style="font-size:19px">If something goes wrong</h3><div class="table-wrap"><table><thead><tr><th>Problem</th><th>Why it happens</th><th>Fix</th></tr></thead><tbody><tr><td>The colours look different after export</td><td>Colour profile not embedded</td><td>Export in sRGB and keep the profile when Krita asks</td></tr><tr><td>The exported file is huge</td><td>300 PPI A4 has about 8.7 million pixels</td><td>That is expected; PNG compression helps, and week 4 covers formats</td></tr><tr><td>I cannot find the hex field</td><td>The colour selector panel is hidden</td><td>Settings › Dockers, then show a colour selector docker</td></tr><tr><td>My contrast fails for every option</td><td>Hue changes do not help much</td><td>Change the value (lighter or darker), not the hue</td></tr></tbody></table></div><h3 style="font-size:19px">Rubric (10 points)</h3><div class="table-wrap"><table><thead><tr><th>Criterion</th><th>Full (2)</th><th>Partial (1)</th><th>Missing (0)</th></tr></thead><tbody><tr><td>Palette</td><td>Named scheme, five hex codes, roles, reason</td><td>Palette without scheme or roles</td><td>Missing</td></tr><tr><td>60-30-10</td><td>Clear dominant, secondary and accent</td><td>Proportions unclear</td><td>Missing</td></tr><tr><td>Contrast</td><td>All pairs pass, before and after recorded</td><td>Some pairs fail or are not recorded</td><td>Not checked</td></tr><tr><td>Exports and sizes</td><td>Three exports, sizes and calculation</td><td>Some missing</td><td>Missing</td></tr><tr><td>Explanation</td><td>Correct reasoning about compression and pixels</td><td>Partly correct</td><td>Missing</td></tr></tbody></table></div></section><div class="next-tab"><a class="btn" href="#glossary">Next: glossary and sources →</a></div></div><div class="tabpanel" id="panel-glossary" data-tab="glossary" role="tabpanel" aria-label="Glossary"><section id="glossary" aria-labelledby="h-gl">
+<p class="eyebrow">Glossary · المصطلحات</p><h2 id="h-gl">Key terms in English and Arabic</h2>
+<label for="g-search" style="font-weight:700; color:var(--ink)">Search a term</label><input type="text" id="g-search" placeholder="Type in English or Arabic" style="max-width:380px">
+<div class="table-wrap"><table><thead><tr><th>English</th><th>Meaning</th><th lang="ar" dir="rtl">العربية</th></tr></thead><tbody id="g-body"></tbody></table></div>
+</section><section id="sources" aria-labelledby="h-src"><p class="eyebrow">Sources</p><h2 id="h-src">Sources for this week</h2><div class="sources"><ol><li>Parekh, R. (2025). <i>Principles of Multimedia</i> (3rd ed.). CRC Press. Colour models and digital image representation.</li><li>Marschner, S., &amp; Shirley, P. (2021). <i>Fundamentals of Computer Graphics</i> (5th ed.). CRC Press. Colour, sampling and anti-aliasing.</li><li>W3C (2023). <i>Web Content Accessibility Guidelines (WCAG) 2.2</i>, success criterion 1.4.3 Contrast (Minimum). <a href="https://www.w3.org/TR/WCAG22/">w3.org/TR/WCAG22</a>. Contrast formula and thresholds used in the checker.</li><li>MedlinePlus Genetics. <i>Color vision deficiency</i>. U.S. National Library of Medicine. <a href="https://medlineplus.gov/genetics/condition/color-vision-deficiency/">medlineplus.gov</a>. Prevalence figures in section 06.</li><li>IEC 61966-2-1:1999. <i>Default RGB colour space: sRGB</i>. International Electrotechnical Commission.</li><li>AlGhamdi, R. (2022). <i>Understanding Colors</i>, CPIT285 lecture notes, King Abdulaziz University. Colour wheel and harmony schemes.</li><li>Illustrations: the RGB cube and all demos are drawn by this page; other drawings are original and made for IT 280 (2027).</li></ol><p class="muted" style="margin-top:12px">Authorship and AI use for all course pages are declared on the course home page.</p></div></section><div class="next-tab"><a class="btn" href="#learn">Back to Learn →</a></div></div><nav class="pager" aria-label="Previous and next week"><a class="pv" href="../week02/"><small>Previous</small><b>Week 2 · Graphics and multimedia systems</b></a><a class="mid" href="../"><small>All weeks</small><b>Course home</b></a><a class="nx" href="../week04/"><small>Next</small><b>Week 4 · Formats, compression and standards</b></a></nav>
+</article>
+</div>
+<footer><div class="foot-in"><span><b>IT 280 · Computer Graphics and Multimedia</b> · Week 3 · Colour and digital images</span><span>Prof. Rayed AlGhamdi · raalghamdi8@kau.edu.sa · King Abdulaziz University</span></div></footer>
+
+<script>
+(function(){
+const $ = (s, r=document) => r.querySelector(s), $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const hex2 = n => n.toString(16).padStart(2, '0').toUpperCase();
+const toHex = (r, g, b) => '#' + hex2(r) + hex2(g) + hex2(b);
+function hsv2rgb(h, s, v){ s/=100; v/=100; const c=v*s, x=c*(1-Math.abs((h/60)%2-1)), m=v-c; let r=0,g=0,b=0;
+  if(h<60){r=c;g=x}else if(h<120){r=x;g=c}else if(h<180){g=c;b=x}else if(h<240){g=x;b=c}else if(h<300){r=x;b=c}else{r=c;b=x}
+  return [Math.round((r+m)*255), Math.round((g+m)*255), Math.round((b+m)*255)]; }
+function hexToRgb(h){ h=h.replace('#',''); return [0,2,4].map(i=>parseInt(h.substr(i,2),16)); }
+function lum(rgb){ const a=rgb.map(v=>{v/=255; return v<=0.03928? v/12.92 : Math.pow((v+0.055)/1.055,2.4)}); return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2]; }
+function ratio(a,b){ const L1=lum(a), L2=lum(b); return (Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05); }
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i]-v)*t));
+const css = rgb => 'rgb(' + rgb.join(',') + ')';
+
+/* key terms */
+$$('.kt').forEach(b => b.addEventListener('click', () => { const on = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', on); $('.kt-ar', b).hidden = !on; }));
+
+/* reading progress + contents */
+const links = $$('.toc a');
+function onScroll(){ const h = document.documentElement; const p = clamp(h.scrollTop / (h.scrollHeight - h.clientHeight), 0, 1);
+  $('#prog').style.width = (p*100) + '%'; $('#prog-label').textContent = Math.round(p*100) + '% read'; }
+window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+if ('IntersectionObserver' in window){ const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id)); }), {rootMargin:'-35% 0px -60% 0px'});
+  links.forEach(a => { const t = $(a.getAttribute('href')); if (t) io.observe(t); }); }
+
+/* RGB cube */
+(function(){ const c = $('#rgbcube'), x = c.getContext('2d'); const W=c.width, H=c.height, s=250, cx=W/2, cy=H/2-110;
+  const P = (r,g,b) => [cx + (r - g)*s*0.866, cy + (r + g)*s*0.5 - b*s - 0.0*s - (-0.5*s)];
+  function face(f){ const N=40; for(let i=0;i<N;i++) for(let j=0;j<N;j++){ const u=i/N, v=j/N, u2=(i+1)/N, v2=(j+1)/N;
+      const q=[f(u,v),f(u2,v),f(u2,v2),f(u,v2)], col=f((i+.5)/N,(j+.5)/N,true);
+      x.fillStyle='rgb('+col.map(t=>Math.round(t*255)).join(',')+')'; x.beginPath(); q.forEach((p,k)=>k?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])); x.closePath(); x.fill(); x.strokeStyle=x.fillStyle; x.lineWidth=1; x.stroke(); } }
+  const mk = fn => (u,v,c) => { const rgb = fn(u,v); return c ? rgb : P(...rgb); };
+  face(mk((u,v)=>[u,v,1])); face(mk((u,v)=>[1,u,v])); face(mk((u,v)=>[u,1,v]));
+  x.strokeStyle='rgba(19,33,58,.55)'; x.lineWidth=2;
+  [[[0,0,1],[1,0,1]],[[1,0,1],[1,1,1]],[[1,1,1],[0,1,1]],[[0,1,1],[0,0,1]],[[1,0,1],[1,0,0]],[[1,1,1],[1,1,0]],[[0,1,1],[0,1,0]],[[1,0,0],[1,1,0]],[[1,1,0],[0,1,0]]].forEach(([a,b])=>{ const p=P(...a), q=P(...b); x.beginPath(); x.moveTo(p[0],p[1]); x.lineTo(q[0],q[1]); x.stroke(); });
+})();
+
+/* additive mixer */
+function add(){ const r=+$('#ar').value, g=+$('#ag').value, b=+$('#ab').value;
+  $('#arv').textContent=r; $('#agv').textContent=g; $('#abv').textContent=b;
+  $('#cR').setAttribute('fill', css([r,0,0])); $('#cG').setAttribute('fill', css([0,g,0])); $('#cB').setAttribute('fill', css([0,0,b]));
+  $('#add-sw').style.background = css([r,g,b]);
+  $('#add-rgb').textContent = 'rgb(' + r + ', ' + g + ', ' + b + ')'; $('#add-hex').textContent = toHex(r,g,b);
+  $('#add-gl').textContent = 'glColor3f(' + [r,g,b].map(v=>(v/255).toFixed(3)).join(', ') + ')'; }
+['#ar','#ag','#ab'].forEach(id => $(id).addEventListener('input', add)); add();
+
+/* subtractive mixer */
+function sub(){ const c=+$('#sc').value/100, m=+$('#sm').value/100, y=+$('#sy').value/100;
+  $('#scv').textContent=Math.round(c*100)+'%'; $('#smv').textContent=Math.round(m*100)+'%'; $('#syv').textContent=Math.round(y*100)+'%';
+  const ink = (absorbR, absorbG, absorbB) => css([Math.round(255*(1-absorbR)), Math.round(255*(1-absorbG)), Math.round(255*(1-absorbB))]);
+  $('#cC').setAttribute('fill', ink(c*0.95,0,0)); $('#cM').setAttribute('fill', ink(0,m*0.95,0)); $('#cY').setAttribute('fill', ink(0,0,y*0.95)); }
+['#sc','#sm','#sy'].forEach(id => $(id).addEventListener('input', sub)); sub();
+
+/* HSV */
+function hsv(){ const h=+$('#hh').value, s=+$('#hs').value, v=+$('#hv').value; const rgb=hsv2rgb(h,s,v);
+  $('#hhv').textContent=h+'°'; $('#hsv-s').textContent=s+'%'; $('#hvv').textContent=v+'%';
+  $('#hsv-sw').style.background=css(rgb); $('#hsv-rgb').textContent='rgb('+rgb.join(', ')+')'; $('#hsv-hex').textContent=toHex(...rgb);
+  const fill=(id,target)=>{ $(id).innerHTML=''; for(let i=0;i<6;i++){ const d=document.createElement('div'); d.style.background=css(mix(rgb,target,i/6)); $(id).appendChild(d);} };
+  fill('#tints',[255,255,255]); fill('#tones',[128,128,128]); fill('#shades',[0,0,0]); }
+['#hh','#hs','#hv'].forEach(id => $(id).addEventListener('input', hsv)); hsv();
+
+/* harmony */
+const NOTES = {/* angles are on the RYB wheel */ mono:'One hue, varied in saturation and value. Calm and safe.', analog:'Neighbouring hues, 30° apart. Calm, natural, low contrast.', comp:'Two hues opposite on the RYB wheel (180° apart), such as blue and orange. Strong contrast: keep one dominant.', split:'Base hue plus the two hues beside its complement (150° and 210°).', triad:'Three hues 120° apart. Lively: let one hue lead.', tetrad:'Four hues forming a rectangle (0°, 60°, 180°, 240°). Hardest to balance.'};
+function ryb2hue(a){ const P=[[0,0],[60,30],[120,60],[180,120],[240,240],[300,280],[360,360]]; a=((a%360)+360)%360; for(let i=0;i<6;i++){ const [a0,h0]=P[i],[a1,h1]=P[i+1]; if(a<=a1) return h0+(h1-h0)*(a-a0)/(a1-a0); } return 0; }
+function scheme(h, k){ const m = d => (h + d + 360) % 360;
+  switch(k){ case 'mono': return [[h,65,45],[h,45,70],[h,25,90],[h,70,30],[h,12,96]];
+    case 'analog': return [[m(-30),55,65],[h,65,55],[m(30),55,65],[h,20,95],[h,60,30]];
+    case 'comp': return [[h,60,50],[h,20,94],[m(180),70,85],[h,55,28],[m(180),25,96]];
+    case 'split': return [[h,60,50],[m(150),60,75],[m(210),60,75],[h,15,95],[h,55,28]];
+    case 'triad': return [[h,60,50],[m(120),55,70],[m(240),55,75],[h,12,96],[h,55,28]];
+    default: return [[h,60,50],[m(60),55,75],[m(180),55,70],[m(240),55,70],[h,12,96]]; } }
+function harmony(){ const h=+$('#bh').value, k=$('#scheme').value; $('#bhv').textContent=h+'° '+(['red','red-orange','orange','yellow-orange','yellow','yellow-green','green','blue-green','blue','blue-violet','violet','red-violet'][Math.round(h/30)%12]); $('#scheme-note').textContent=NOTES[k];
+  const cols = scheme(h,k).map(c => hsv2rgb(ryb2hue(c[0]), c[1], c[2]));
+  $('#palette').innerHTML = cols.map(c => { const t = lum(c) > 0.4 ? '#13213A' : '#FFFFFF'; return '<div style="background:'+css(c)+'; color:'+t+'">'+toHex(...c)+'</div>'; }).join('');
+  const hues = [...new Set(scheme(h,k).map(c=>c[0]))]; const R=101, C=120;
+  $('#markers').innerHTML = hues.map(a => { const rad=(a)*Math.PI/180; const x=C+R*Math.cos(rad), y=C+R*Math.sin(rad); return '<span class="marker" style="left:'+x+'px; top:'+y+'px; background:'+css(hsv2rgb(ryb2hue(a),85,90))+'"></span>'; }).join('');
+  // 60-30-10 preview: light tint of base as dominant, strong base as secondary, scheme's contrasting hue as accent
+  const light = cols.find((c,i)=>scheme(h,k)[i][2]>=90) || [244,246,248];
+  const dark = cols.find((c,i)=>scheme(h,k)[i][2]<=50 && scheme(h,k)[i][0]===h) || cols[0];
+  const accent = k==='mono' ? cols[0] : cols.find((c,i)=>scheme(h,k)[i][0]!==h) || cols[0];
+  $('#mock').style.background = css(light); $('#mock-top').style.background = css(dark); $('#mock-top').style.color = lum(dark)>0.4?'#13213A':'#FFFFFF';
+  $('#mock-text').style.color = '#13213A'; $('#mock-btn').style.background = css(accent); $('#mock-btn').style.color = lum(accent)>0.4?'#13213A':'#FFFFFF'; }
+$('#bh').addEventListener('input', harmony); $('#scheme').addEventListener('change', harmony); harmony();
+
+/* contrast */
+function contrast(){ const f=hexToRgb($('#fg').value), b=hexToRgb($('#bgc').value); const r=ratio(f,b);
+  $('#ratio').textContent = r.toFixed(2) + ' : 1';
+  const chip=(ok,l)=>'<span class="'+(ok?'ok':'no')+'">'+(ok?'✓ Pass':'✗ Fail')+' · '+l+'</span>';
+  $('#pf').innerHTML = chip(r>=4.5,'Normal text (4.5)') + chip(r>=3,'Large text (3)') + chip(r>=7,'Enhanced (7)');
+  $('#sample').style.background=$('#bgc').value; $('#sample').style.color=$('#fg').value; }
+['#fg','#bgc'].forEach(id => $(id).addEventListener('input', contrast)); contrast();
+
+/* bit depth */
+function banding(){ const bits=+$('#bits').value, L=Math.pow(2,bits); $('#bitsv').textContent=bits;
+  $('#levels').textContent = L + ' levels per channel'; $('#colours').textContent = (Math.pow(L,3)).toLocaleString('en-US') + ' possible colours';
+  const c=$('#band'), x=c.getContext('2d'); const a=[31,45,92], m=[205,96,120], z=[245,190,110];
+  for(let i=0;i<c.width;i++){ const t=i/(c.width-1); const col = t<0.5 ? mix(a,m,t*2) : mix(m,z,(t-0.5)*2);
+    const q = col.map(v => Math.round(Math.round(v/255*(L-1))/(L-1)*255)); x.fillStyle=css(q); x.fillRect(i,0,1,c.height); } }
+$('#bits').addEventListener('input', banding); banding();
+
+/* file size */
+const fmt = n => n.toLocaleString('en-US');
+function size(){ const w=Math.max(1,+$('#sw').value||0), h=Math.max(1,+$('#shh').value||0), b=+$('#sbpp').value; const px=w*h, bytes=px*b/8;
+  $('#o-px').textContent=fmt(px); $('#o-b').textContent=fmt(Math.round(bytes)); $('#o-mb').textContent=(bytes/1e6).toFixed(2);
+  $('#o-steps').textContent = fmt(w)+' × '+fmt(h)+' × '+b+' ÷ 8 = '+fmt(Math.round(bytes))+' bytes ≈ '+(bytes/1e6).toFixed(2)+' MB ('+(bytes/1048576).toFixed(2)+' MiB)'; }
+['#sw','#shh','#sbpp'].forEach(id => $(id).addEventListener('input', size)); size();
+
+/* print */
+function print(){ const w=+$('#pw').value||0, h=+$('#ph').value||0, ppi=+$('#pp').value; const pw=Math.round(w/2.54*ppi), ph=Math.round(h/2.54*ppi);
+  $('#p-w').textContent=fmt(pw)+' px'; $('#p-h').textContent=fmt(ph)+' px'; $('#p-mp').textContent=(pw*ph/1e6).toFixed(1); }
+['#pw','#ph','#pp'].forEach(id => $(id).addEventListener('input', print)); print();
+
+/* aliasing */
+let AA=0;
+function alias(){ const N=+$('#grid').value; $('#gridv').textContent=N; const c=$('#alias'), x=c.getContext('2d'), S=c.width, cell=S/N;
+  const ink=[19,33,58], paper=[255,255,255];
+  const inside=(px,py)=>{ const dx=px-0.62, dy=py-0.38; const inC = dx*dx+dy*dy <= 0.27*0.27; const d = Math.abs(py - (0.95 - 0.8*px)) ; const inL = d < 0.035 && px>0.05 && px<0.95; return inC || inL; };
+  for(let i=0;i<N;i++) for(let j=0;j<N;j++){ let cov=0; const k=AA?4:1;
+    for(let a=0;a<k;a++) for(let b=0;b<k;b++){ const px=(i+(a+0.5)/k)/N, py=(j+(b+0.5)/k)/N; if(inside(px,py)) cov++; }
+    cov/=k*k; x.fillStyle=css(mix(paper,ink,cov)); x.fillRect(i*cell,j*cell,Math.ceil(cell),Math.ceil(cell)); }
+  if (N<=32){ x.strokeStyle='rgba(19,33,58,.12)'; x.lineWidth=1; for(let i=0;i<=N;i++){ x.beginPath(); x.moveTo(i*cell,0); x.lineTo(i*cell,S); x.stroke(); x.beginPath(); x.moveTo(0,i*cell); x.lineTo(S,i*cell); x.stroke(); } }
+  if ($('#outline').checked){ x.strokeStyle='#E2A04A'; x.lineWidth=3; x.beginPath(); x.arc(0.62*S,0.38*S,0.27*S,0,Math.PI*2); x.stroke(); x.beginPath(); x.moveTo(0.05*S,(0.95-0.04)*S); x.lineTo(0.95*S,(0.95-0.76)*S); x.stroke(); } }
+$('#grid').addEventListener('input', alias); $('#outline').addEventListener('change', alias);
+$$('[data-aa]').forEach(b => b.addEventListener('click', () => { AA=+b.dataset.aa; $$('[data-aa]').forEach(x => x.setAttribute('aria-pressed', x===b ? 'true' : 'false')); alias(); })); alias();
+
+/* quiz */
+const Q = [
+ ['Why does a screen need only red, green and blue sub-pixels to show millions of colours?', ['Because those are the colours of paint', 'Because the human eye has three kinds of colour-sensitive cone', 'Because 24 bits can only store three colours', 'Because printers use the same three colours'], 1, 'Your eye has three kinds of cone. Varying red, green and blue light stimulates them in different proportions.'],
+ ['What is rgb(255, 255, 0) on a screen?', ['Yellow', 'White', 'Orange', 'Cyan'], 0, 'Full red plus full green light, with no blue, is seen as yellow.'],
+ ['Which ink do printers add to cyan, magenta and yellow, and why?', ['White, to make colours lighter', 'Black (K), because CMY together make a muddy dark brown and waste ink', 'Red, to widen the gamut', 'None: CMY makes a perfect black'], 1, 'In practice CMY inks do not absorb all light, so a separate black ink gives true black and saves ink.'],
+ ['A team uses a triadic palette in equal amounts on a large poster. The best fix is to:', ['Add a fourth hue', 'Let one hue dominate (about 60%), one support (30%) and one accent (10%)', 'Raise the saturation of all three', 'Switch to CMYK'], 1, 'Equal amounts of three strong hues compete; 60-30-10 gives the eye a clear order.'],
+ ['What is the uncompressed size of a 1000 × 1000 image at 24 bits per pixel?', ['1,000,000 bytes', '3,000,000 bytes', '24,000,000 bytes', '8,000,000 bytes'], 1, '1000 × 1000 × 24 ÷ 8 = 3,000,000 bytes, about 3 MB.'],
+ ['Body text has a contrast ratio of 3.2 : 1 against its background. Under WCAG it:', ['Passes for normal text', 'Fails for normal text but passes for large text', 'Fails for all text', 'Passes the enhanced level'], 1, 'Normal text needs 4.5 : 1; large text needs 3 : 1.']
+];
+$('#quiz').innerHTML = Q.map((q,i)=>'<fieldset class="q" data-ans="'+q[2]+'"><legend>'+(i+1)+'. '+q[0]+'</legend>'+q[1].map((o,j)=>'<label class="opt"><input type="radio" name="q'+i+'" value="'+j+'"><span>'+o+'</span></label>').join('')+'<p class="why" hidden>'+q[3]+'</p></fieldset>').join('');
+$('#q-check').addEventListener('click', () => { let ok=0; $$('.q').forEach(q => { const a=+q.dataset.ans, sel=q.querySelector('input:checked'); $$('.opt',q).forEach(o=>o.classList.remove('right','wrong')); $$('.opt',q)[a].classList.add('right'); if(sel && +sel.value!==a) sel.closest('.opt').classList.add('wrong'); if(sel && +sel.value===a) ok++; $('.why',q).hidden=false; }); $('#q-score').textContent='Score: '+ok+' of '+Q.length; });
+$('#q-reset').addEventListener('click', () => { $('#quiz').reset(); $$('.opt').forEach(o=>o.classList.remove('right','wrong')); $$('.why').forEach(w=>w.hidden=true); $('#q-score').textContent=''; });
+
+/* glossary */
+const G = [['Additive colour','Making colours by adding light; starts from black','المزج الجمعي للألوان'],['Subtractive colour','Making colours by absorbing light with ink; starts from white','المزج الطرحي للألوان'],['Channel','One of the R, G or B components of a colour','قناة اللون'],['Hexadecimal code','A colour written as #RRGGBB','الرمز الست عشري للون'],['Hue','The colour family, as an angle on the wheel','صبغة اللون'],['Saturation','How pure or intense a colour is','التشبّع'],['Value / brightness','How light or dark a colour is','القيمة، السطوع'],['Tint','A colour mixed with white','التفتيح'],['Tone','A colour mixed with grey','التدرّج الرمادي'],['Shade','A colour mixed with black','التعتيم'],['Colour harmony','A pleasing combination of colours','انسجام الألوان'],['Complementary colours','Hues opposite each other on the wheel','الألوان المتكاملة'],['Analogous colours','Hues next to each other on the wheel','الألوان المتجاورة'],['Contrast ratio','How much text stands out from its background','نسبة التباين'],['Pixel','The smallest element of a digital image','بكسل، عنصر الصورة'],['Bit depth','Bits used to store each pixel’s colour','عمق البت'],['Banding','Visible stripes in a gradient caused by too few levels','التشريط اللوني'],['Resolution','The number of pixels, width × height','الدقة'],['Pixels per inch (PPI)','How densely pixels are printed or displayed','بكسل لكل بوصة'],['Sampling','Testing points of a shape to decide pixel colours','أخذ العيّنات'],['Aliasing','Jagged, stair-step edges','التسنّن، تعرّج الحواف'],['Anti-aliasing','Smoothing edges with in-between shades','تنعيم الحواف'],['Colour space','A defined, measurable set of colours, such as sRGB','فضاء الألوان'],['Gamut','The range of colours a device or space can show','نطاق الألوان']];
+$('#g-body').innerHTML = G.map(g=>'<tr><td><b>'+g[0]+'</b></td><td>'+g[1]+'</td><td lang="ar" dir="rtl">'+g[2]+'</td></tr>').join('');
+$('#g-search').addEventListener('input', e => { const q=e.target.value.trim().toLowerCase(); $$('#g-body tr').forEach(r => { r.hidden = q && !r.textContent.toLowerCase().includes(q); }); });
+})();
+</script>
+<script>
+(function(){
+const TABS = ['learn','practise','lab','glossary'];
+const panels = Array.from(document.querySelectorAll('.tabpanel')), tabs = Array.from(document.querySelectorAll('.tab')), tocItems = Array.from(document.querySelectorAll('.toc li[data-tab]'));
+const tabsBar = document.querySelector('.tabs');
+function show(tab, target){
+  panels.forEach(p => p.hidden = p.dataset.tab !== tab);
+  tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false'));
+  tocItems.forEach(li => li.hidden = li.dataset.tab !== tab);
+  if (target) { target.scrollIntoView(); setTimeout(() => target.scrollIntoView(), 120); }
+  else if (tab !== 'learn' || window.scrollY > tabsBar.offsetTop) window.scrollTo(0, Math.max(0, tabsBar.offsetTop - 60));
+}
+function route(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (TABS.includes(h)) return show(h);
+  const el = h && document.getElementById(h);
+  const p = el && el.closest('.tabpanel');
+  if (p) return show(p.dataset.tab, el);
+  show('learn');
+}
+window.addEventListener('hashchange', route); route();
+})();
+</script>
+<script>
+(function(){
+const btns = Array.from(document.querySelectorAll('.ar-btn[aria-controls]')), all = document.getElementById('ar-all');
+function set(b, on){ b.setAttribute('aria-expanded', on ? 'true' : 'false'); document.getElementById(b.getAttribute('aria-controls')).hidden = !on; }
+function syncAll(){ const on = btns.length && btns.every(b => b.getAttribute('aria-expanded') === 'true'); all.setAttribute('aria-pressed', on ? 'true' : 'false'); all.textContent = on ? 'إخفاء الشرح العربي' : 'عرض الشرح العربي لكل الأقسام'; }
+btns.forEach(b => b.addEventListener('click', () => { set(b, b.getAttribute('aria-expanded') !== 'true'); syncAll(); }));
+all.addEventListener('click', () => { const on = all.getAttribute('aria-pressed') !== 'true'; btns.forEach(b => set(b, on)); syncAll(); try { localStorage.setItem('it280-ar', on ? '1' : '0'); } catch(e){} });
+try { if (localStorage.getItem('it280-ar') === '1') btns.forEach(b => set(b, true)); } catch(e){}
+syncAll();
+})();
+</script>
+</body>
+</html>
